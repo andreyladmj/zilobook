@@ -1,0 +1,29 @@
+# Caddy v2 — automatic HTTPS for all domains below.
+# /api/* goes to the Go backend, everything else to Next.js.
+# Add new niche domains here AND in frontend/src/lib/niches.ts.
+
+(zilobook) {
+	encode gzip
+
+	handle /api/* {
+		reverse_proxy backend:8080
+	}
+
+	handle {
+		reverse_proxy frontend:3000
+	}
+}
+
+zilobook.com,
+nails.zilobook.com,
+beauty.zilobook.com,
+fit.zilobook.com,
+trainer.zilobook.com,
+auto.zilobook.com,
+app.zilobook.com {
+	import zilobook
+}
+
+www.zilobook.com {
+	redir https://zilobook.com{uri} permanent
+}

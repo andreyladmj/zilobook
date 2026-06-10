@@ -1,0 +1,12 @@
+DROP INDEX IF EXISTS idx_appointments_end_time;
+DROP INDEX IF EXISTS idx_appointments_start_time;
+DROP TABLE IF EXISTS appointments;
+DROP TABLE IF EXISTS schedule_blocks;
+DROP TABLE IF EXISTS professional_working_hours;
+DROP TABLE IF EXISTS professional_locations;
+DROP TABLE IF EXISTS location_images;
+DROP TABLE IF EXISTS locations;
+DROP TABLE IF EXISTS user_phones;
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS users;
+DROP EXTENSION IF EXISTS "pgcrypto";

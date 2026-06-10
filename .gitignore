@@ -1,53 +1,73 @@
-# OS files
-.DS_Store
-Thumbs.db
+# ===== Secrets — NEVER commit =====
+.env
+.env.*
+!*.env.example
+*.pem
+*.key
+deploy_key*
+id_ed25519*
 
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.Python
-*.so
-.venv/
-venv/
-ENV/
+# ===== Database dumps / backups =====
+*.sql.gz
+*.dump
+backups/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# ===== Dependencies =====
+node_modules/
 
-# Logs
+# ===== Build output =====
+dist/
+build/
+.next/
+out/
+*.exe
+*.test
+backend/gymapp-backend
+backend/zilobook-api
+*.tsbuildinfo
+
+# ===== Cache =====
+.cache/
+.turbo/
+coverage/
+
+# ===== Logs =====
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Dependencies
-node_modules/
+# ===== OS files =====
+.DS_Store
+Thumbs.db
 
-# Build output
-dist/
-build/
-.next/
-.nuxt/
-.output/
-out/
+# ===== IDE =====
+.idea/
+.vscode/
+*.swp
+*.swo
 
-# Cache
-.cache/
-.parcel-cache/
-.turbo/
+# ===== Python (local test scripts) =====
+__pycache__/
+*.py[cod]
+.venv/
+venv/
 
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Local settings
-.claude/settings.local.json
-.claude/session-state/
-ui-ux-pro-max-website/*
+# ===== Local AI tooling & working notes (not part of the app) =====
+.claude/
+.claude-plugin/
+.factory/
+.shared/
+/cli/
+/src/
+/docs/
+/preview/
+/screenshots/
+/contexts/
+context.md
+plan.txt
+architecture_plan.md
+site_audit_report.txt
+skill.json
+ui-ux-pro-max-website/

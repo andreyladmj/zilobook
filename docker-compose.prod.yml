@@ -1,0 +1,57 @@
+# Production stack: Caddy (TLS) -> Next.js frontend + Go API -> Postgres.
+# Usage on the server:  docker compose -f docker-compose.prod.yml up -d --build
+# Secrets live in .env next to this file (see deploy/.env.example).
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: zilobook
+      POSTGRES_USER: zilobook
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zilobook -d zilobook"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://zilobook:${POSTGRES_PASSWORD}@db:5432/zilobook?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      PORT: "8080"
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://zilobook.com}
+      GIN_MODE: release
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:

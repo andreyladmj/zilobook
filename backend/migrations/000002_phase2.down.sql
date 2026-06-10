@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS waitlist;
+DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS user_settings;
+DROP TABLE IF EXISTS activity_log;
+ALTER TABLE locations DROP COLUMN IF EXISTS owner_id;
