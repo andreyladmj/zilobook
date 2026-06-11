@@ -253,6 +253,17 @@ export const THEMES = {
 
 export type ThemeKey = keyof typeof THEMES;
 
+// Public booking pages theme by the location's type, not by visitor preference.
+const LOCATION_TYPE_THEMES: Record<string, ThemeKey> = {
+  Gym: "fitness",
+  Saloon: "beauty",
+  Station: "service",
+};
+
+export function themeForLocationType(type: string | undefined): ThemeKey {
+  return (type && LOCATION_TYPE_THEMES[type]) || "default";
+}
+
 interface ThemeContextType {
   themeId: ThemeKey;
   setThemeId: (t: ThemeKey) => void;
@@ -261,19 +272,24 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+// persist=true (dashboard): theme is a user preference stored in localStorage.
+// persist=false (public booking pages): theme is derived from data, localStorage untouched.
+export function ThemeProvider({ children, persist = true }: { children: React.ReactNode; persist?: boolean }) {
   const [themeId, setThemeId] = useState<ThemeKey>("default");
 
   useEffect(() => {
+    if (!persist) return;
     const stored = localStorage.getItem("zilobook-theme") as ThemeKey;
     if (stored && THEMES[stored]) {
       setThemeId(stored);
     }
-  }, []);
+  }, [persist]);
 
   const handleSetTheme = (t: ThemeKey) => {
     setThemeId(t);
-    localStorage.setItem("zilobook-theme", t);
+    if (persist) {
+      localStorage.setItem("zilobook-theme", t);
+    }
   };
 
   return (

@@ -13,7 +13,7 @@ Status legend: `[x]` done · `[ ]` todo · `[~]` partially done.
 - [x] Theme switcher hidden on niche-locked domains (`lockTheme`)
 - [x] Marketplace (`/explore`) hidden behind `FEATURES.marketplace = false`
 - [x] Backend `CORS_ORIGIN` accepts comma-separated origins
-- [ ] Booking page (`/location/[id]`, `/book`, `/checkout`) themed by `location.type` instead of client-side theme state
+- [x] Booking page (`/location/[id]`, `/book`, `/checkout`) themed by `location.type` (ThemeProvider persist=false + themeForLocationType)
 - [ ] Registration pre-selects `location.type` from the niche domain the pro signed up on
 - [ ] Replace placeholder domains in `niches.ts` with real purchased domains
 - [ ] Dashboard moved/kept on a single neutral app domain (`app.<domain>`); niche domains only host landing + booking links
@@ -45,9 +45,10 @@ Ukrainian PSPs (WayForPay, LiqPay/Privat, Fondy, monobank acquiring) all ship **
 - [ ] Stripe is NOT available in Ukraine — do not plan around it
 
 ### 1.4 Localization
-- [ ] Ukrainian as default UI language for all public pages (landing, booking flow, emails/notifications); English optional later
-- [ ] Currency UAH everywhere client-facing (₴, no $ leftovers in demo data)
-- [ ] Demo calendar events in `LandingClient.tsx` localized per niche (e.g. "Манікюр, гель", "Кросфіт 12/15")
+- [x] Ukrainian UI for public pages: landing, location page, booking flow, checkout, login/register; `lang="uk"`, UA metadata
+- [x] Demo calendar events in `LandingClient.tsx` localized per niche, 24h time format, ₴ in demo data
+- [ ] Dashboard (pro cabinet) localization — still English
+- [ ] Notifications/emails in Ukrainian (when notifications exist)
 - [ ] Phone input mask +380, validation server-side
 
 ## Phase 2 — Content & visuals
@@ -84,12 +85,11 @@ Ukrainian PSPs (WayForPay, LiqPay/Privat, Fondy, monobank acquiring) all ship **
 
 ## Phase 5 — Infrastructure & deploy
 
-- [ ] **Deploy NOW to staging** (see "When to deploy" below)
-- [ ] Hosting: single VPS (Hetzner/DO, EU region) + Docker Compose: Go API, Postgres, Caddy/nginx (auto-TLS) — OR Vercel for Next.js + VPS for Go+Postgres. VPS-only is cheaper and fine at this scale
-- [ ] Domains: buy real ones, point niche domains + app domain to the same frontend; set `CORS_ORIGIN` list
-- [ ] Postgres: daily automated backups (pg_dump → object storage), tested restore
-- [ ] CI/CD: GitHub Actions — test → build → deploy on push to main; staging on PR merge
-- [ ] Secrets: real JWT_SECRET, DB password, PSP keys via env (never in repo); fail startup on default JWT_SECRET in prod
+- [x] **Deployed**: Hetzner VPS (Ubuntu 24.04) + Docker Compose (Caddy auto-TLS → Next.js + Go API → Postgres 17), see `deploy/README.md`
+- [x] Domains: zilobook.com bought (Cloudflare Registrar); `@`, `www`, `nails`, `app` live behind Cloudflare proxy, SSL Full (strict), Always Use HTTPS
+- [~] Postgres backups: `deploy/backup-db.sh` written — **cron not set up on server yet**; off-server upload + restore test still TODO
+- [~] CI/CD: `.github/workflows/deploy.yml` ready — **needs DEPLOY_HOST / DEPLOY_SSH_KEY repo secrets**; no test step before deploy yet
+- [x] Secrets: real JWT_SECRET + DB password in server-side .env; backend refuses default JWT_SECRET when GIN_MODE=release
 - [ ] Monitoring: Sentry (frontend + Go), uptime check on booking link route (Betterstack/UptimeRobot), structured logs
 - [ ] Error pages, 404, maintenance page
 

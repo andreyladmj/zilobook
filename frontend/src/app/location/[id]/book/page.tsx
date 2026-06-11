@@ -4,7 +4,7 @@ import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
-import { ThemeProvider, useTheme } from "@/components/ThemeProvider";
+import { ThemeProvider, useTheme, themeForLocationType } from "@/components/ThemeProvider";
 import { fetchLocation, fetchAvailability, type Location, type Professional, type TimeSlot } from "@/lib/api";
 
 const FALLBACK_IMAGES: Record<string, string> = {
@@ -13,9 +13,17 @@ const FALLBACK_IMAGES: Record<string, string> = {
   Station: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1200&q=80",
 };
 
+const VIEW_LABELS: Record<"Day" | "Week" | "Month", string> = {
+  Day: "День",
+  Week: "Тиждень",
+  Month: "Місяць",
+};
+
+const WEEKDAYS_SHORT = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
+
 function BookingInner({ id }: { id: string }) {
   const router = useRouter();
-  const { th } = useTheme();
+  const { th, setThemeId } = useTheme();
 
   const [location, setLocation] = useState<Location | null>(null);
   const [selectedPro, setSelectedPro] = useState<Professional | null>(null);
@@ -29,9 +37,14 @@ function BookingInner({ id }: { id: string }) {
 
   useEffect(() => {
     fetchLocation(id)
-      .then((loc) => { setLocation(loc); if (loc.professionals?.length) setSelectedPro(loc.professionals[0]); })
+      .then((loc) => {
+        setLocation(loc);
+        setThemeId(themeForLocationType(loc.type));
+        if (loc.professionals?.length) setSelectedPro(loc.professionals[0]);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
@@ -56,7 +69,7 @@ function BookingInner({ id }: { id: string }) {
     return Array.from({ length: 7 }, (_, i) => {
       const date = new Date(monday);
       date.setDate(monday.getDate() + i);
-      return { label: date.toLocaleDateString("en-US", { weekday: "short" }), dateNum: date.getDate(), dateStr: date.toISOString().split("T")[0], isWeekend: date.getDay() === 0 || date.getDay() === 6, isToday: date.toISOString().split("T")[0] === today.toISOString().split("T")[0] };
+      return { label: WEEKDAYS_SHORT[i], dateNum: date.getDate(), dateStr: date.toISOString().split("T")[0], isWeekend: date.getDay() === 0 || date.getDay() === 6, isToday: date.toISOString().split("T")[0] === today.toISOString().split("T")[0] };
     });
   };
 
@@ -69,13 +82,13 @@ function BookingInner({ id }: { id: string }) {
   };
 
   const dateDisplay = view === "Month"
-    ? new Date(selectedDate).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    ? new Date(selectedDate).toLocaleDateString("uk-UA", { month: "long", year: "numeric" })
     : view === "Week"
-      ? `Week of ${new Date(selectedDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
-      : new Date(selectedDate).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+      ? `Тиждень з ${new Date(selectedDate).toLocaleDateString("uk-UA", { day: "numeric", month: "short" })}`
+      : new Date(selectedDate).toLocaleDateString("uk-UA", { weekday: "long", month: "long", day: "numeric" });
 
   if (loading) return <div className={clsx("min-h-screen flex items-center justify-center", th.bg)}><div className={clsx("w-10 h-10 border-4 rounded-full animate-spin", th.border, "border-t-current")}></div></div>;
-  if (!location) return <div className={clsx("min-h-screen flex items-center justify-center", th.bg, th.subText)}>Location not found</div>;
+  if (!location) return <div className={clsx("min-h-screen flex items-center justify-center", th.bg, th.subText)}>Сторінку не знайдено</div>;
 
   const heroImage = location.images?.length > 0 ? location.images[0].image_url : FALLBACK_IMAGES[location.type] || FALLBACK_IMAGES.Gym;
   const pros = location.professionals || [];
@@ -89,7 +102,7 @@ function BookingInner({ id }: { id: string }) {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
           </button>
           <div className="flex flex-col items-center">
-            <span className="font-bold text-sm">Book Appointment</span>
+            <span className="font-bold text-sm">Запис</span>
             <span className={clsx("text-[11px] font-medium", th.subText)}>{location.name}</span>
           </div>
           <Link href="/" className={clsx("w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black", th.brand)}>Z</Link>
@@ -106,7 +119,7 @@ function BookingInner({ id }: { id: string }) {
       {pros.length > 0 && (
         <div className={clsx("border-b py-4 z-10 sticky top-[56px] shadow-sm", th.cardBg, th.border)}>
           <div className="max-w-6xl mx-auto px-4">
-            <p className={clsx("text-[11px] font-bold uppercase tracking-widest mb-3", th.subText)}>Choose Professional</p>
+            <p className={clsx("text-[11px] font-bold uppercase tracking-widest mb-3", th.subText)}>Оберіть майстра</p>
             <div className="flex items-center gap-3 overflow-x-auto pb-1 no-scrollbar">
               {pros.map(pro => (
                 <button key={pro.id} onClick={() => setSelectedPro(pro)} className={clsx("flex-shrink-0 flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all", selectedPro?.id === pro.id ? th.proCardSelected : th.proCardDefault)}>
@@ -115,7 +128,7 @@ function BookingInner({ id }: { id: string }) {
                   </div>
                   <div className="text-left">
                     <h4 className="font-bold text-sm leading-tight">{pro.full_name}</h4>
-                    <p className={clsx("text-[11px] font-medium", th.subText)}>{pro.role_description || "Professional"}</p>
+                    <p className={clsx("text-[11px] font-medium", th.subText)}>{pro.role_description || "Майстер"}</p>
                   </div>
                 </button>
               ))}
@@ -137,8 +150,8 @@ function BookingInner({ id }: { id: string }) {
             </button>
           </div>
           <div className={clsx("flex p-1 rounded-xl w-full md:w-auto", th.tabBg)}>
-            {["Day", "Week", "Month"].map(type => (
-              <button key={type} onClick={() => setView(type as any)} className={clsx("flex-1 md:px-5 py-2 rounded-lg font-bold text-sm transition-all", view === type ? th.activeTab : clsx(th.subText, "hover:opacity-80"))}>{type}</button>
+            {(["Day", "Week", "Month"] as const).map(type => (
+              <button key={type} onClick={() => setView(type)} className={clsx("flex-1 md:px-5 py-2 rounded-lg font-bold text-sm transition-all", view === type ? th.activeTab : clsx(th.subText, "hover:opacity-80"))}>{VIEW_LABELS[type]}</button>
             ))}
           </div>
         </div>
@@ -149,12 +162,12 @@ function BookingInner({ id }: { id: string }) {
               <div className={clsx("w-14 h-14 rounded-2xl flex items-center justify-center mx-auto", th.tabBg)}>
                 <svg className={clsx("w-7 h-7", th.subText)} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>
               </div>
-              <p className={clsx("font-medium", th.subText)}>{pros.length === 0 ? "No professionals available." : "Please select a professional above."}</p>
+              <p className={clsx("font-medium", th.subText)}>{pros.length === 0 ? "Немає доступних майстрів." : "Оберіть майстра вище."}</p>
             </div>
           ) : slotsLoading ? (
             <div className="p-16 text-center">
               <div className={clsx("w-8 h-8 border-4 rounded-full animate-spin mx-auto", th.border, "border-t-current")}></div>
-              <p className={clsx("font-semibold mt-4", th.subText)}>Loading availability...</p>
+              <p className={clsx("font-semibold mt-4", th.subText)}>Завантажуємо вільний час...</p>
             </div>
           ) : view === "Day" ? (
             <div className={clsx("divide-y", th.border)}>
@@ -163,7 +176,7 @@ function BookingInner({ id }: { id: string }) {
                   <div className={clsx("w-14 h-14 rounded-2xl flex items-center justify-center mx-auto", th.tabBg)}>
                     <svg className={clsx("w-7 h-7", th.subText)} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                   </div>
-                  <p className={clsx("font-medium", th.subText)}>No working hours set for this date.</p>
+                  <p className={clsx("font-medium", th.subText)}>На цю дату немає робочих годин.</p>
                 </div>
               ) : slots.map((slot, i) => (
                 <button key={i} disabled={!slot.available} onClick={() => handleSlotClick(slot)} className={clsx("w-full flex items-center justify-between px-6 py-5 transition-all group", slot.available ? "cursor-pointer hover:opacity-80" : "opacity-40 cursor-not-allowed")}>
@@ -174,7 +187,7 @@ function BookingInner({ id }: { id: string }) {
                     <span className="font-mono font-bold text-lg tracking-tight">{slot.end_time}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={clsx("text-xs font-bold uppercase px-3 py-1.5 rounded-lg", slot.available ? th.slotAvailBadge : th.slotBookedBadge)}>{slot.available ? "Available" : "Booked"}</span>
+                    <span className={clsx("text-xs font-bold uppercase px-3 py-1.5 rounded-lg", slot.available ? th.slotAvailBadge : th.slotBookedBadge)}>{slot.available ? "Вільно" : "Зайнято"}</span>
                     {slot.available && <svg className={clsx("w-5 h-5 opacity-30 group-hover:opacity-70 transition-opacity", th.subText)} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>}
                   </div>
                 </button>
@@ -183,7 +196,7 @@ function BookingInner({ id }: { id: string }) {
           ) : view === "Month" ? (
             <div>
               <div className={clsx("grid grid-cols-7 border-b", th.border)}>
-                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => (
+                {WEEKDAYS_SHORT.map(d => (
                   <div key={d} className={clsx("py-3 text-center text-[11px] font-bold uppercase tracking-wider", th.subText)}>{d}</div>
                 ))}
               </div>
@@ -225,5 +238,5 @@ function BookingInner({ id }: { id: string }) {
 
 export default function PublicBookingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  return <ThemeProvider><BookingInner id={id} /></ThemeProvider>;
+  return <ThemeProvider persist={false}><BookingInner id={id} /></ThemeProvider>;
 }

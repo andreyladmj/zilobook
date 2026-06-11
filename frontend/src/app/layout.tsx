@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zilobook — Booking for Professionals",
-  description: "Multi-niche booking platform for fitness trainers, beauty specialists, and auto service professionals.",
+  title: "Zilobook — онлайн-запис клієнтів",
+  description: "Онлайн-запис для незалежних майстрів: б'юті, фітнес, автосервіс. Посилання для запису в біо, нагадування клієнтам, захист від no-show.",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="uk"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
