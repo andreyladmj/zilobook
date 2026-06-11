@@ -1,6 +1,9 @@
 # Caddy v2 — automatic HTTPS for all domains below.
 # /api/* goes to the Go backend, everything else to Next.js.
-# Add new niche domains here AND in frontend/src/lib/niches.ts.
+#
+# IMPORTANT: every hostname here MUST have a DNS record in Cloudflare,
+# otherwise Caddy fails to obtain its certificate and spams retry errors.
+# Adding a new niche domain = DNS record + this file + frontend/src/lib/niches.ts.
 
 (zilobook) {
 	encode gzip
@@ -16,10 +19,6 @@
 
 zilobook.com,
 nails.zilobook.com,
-beauty.zilobook.com,
-fit.zilobook.com,
-trainer.zilobook.com,
-auto.zilobook.com,
 app.zilobook.com {
 	import zilobook
 }
@@ -27,3 +26,8 @@ app.zilobook.com {
 www.zilobook.com {
 	redir https://zilobook.com{uri} permanent
 }
+
+# Future niche domains — uncomment after creating their DNS records:
+# beauty.zilobook.com, fit.zilobook.com, trainer.zilobook.com, auto.zilobook.com {
+# 	import zilobook
+# }
