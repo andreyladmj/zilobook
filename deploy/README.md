@@ -65,6 +65,8 @@ chmod +x deploy/backup-db.sh
 
 После этого каждый push в `main` автоматически обновляет прод (`.github/workflows/deploy.yml`).
 
+Статус: автодеплой настроен и проверен (секреты добавлены, деплой-ключ на сервере).
+
 ## Обновление вручную
 ```bash
 cd /opt/zilobook/app && git pull && docker compose -f docker-compose.prod.yml up -d --build
