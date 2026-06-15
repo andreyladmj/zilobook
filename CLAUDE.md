@@ -58,7 +58,8 @@ backend/
 ├── routes/router.go     # Centralized Gin routing + CORS + middleware groups
 └── migrations/
     ├── 000001_init.up.sql     # Core schema (9 tables)
-    └── 000002_phase2.up.sql   # activity_log, user_settings, services, reviews, waitlist, notifications + locations.owner_id
+    ├── 000002_phase2.up.sql   # activity_log, user_settings, services, reviews, waitlist, notifications + locations.owner_id
+    └── 000003_telegram.up.sql # telegram_accounts, telegram_link_codes + notifications dispatch columns
 ```
 
 ## Database Schema (15 tables, all UUID PKs)
@@ -111,6 +112,20 @@ frontend/src/
 - GET /api/users/me/locations → user's own locations
 - GET /api/users/me/settings → settings (auto-creates defaults)
 - PUT /api/users/me/settings → partial update settings
+### Notifications (protected)
+- GET /api/notifications/telegram/link → {linked, deep_link?} one-time Telegram connect link (503 if bot not configured)
+
+## Notifications (Telegram)
+Provider-agnostic notification subsystem; Telegram is the primary (free) channel.
+- `telegram/client.go` — minimal Bot API client (stdlib only): long-poll `getUpdates` + `sendMessage`.
+- `services/notification_service.go` — two background goroutines started in main.go via `notifySvc.Start()`:
+  dispatcher (every 60s delivers due `notifications` rows) + bot poller (handles `/start <code>` account linking).
+- `notifications` table is a dispatch queue (extended in migration 000003 with appointment_id, scheduled_for, attempts).
+- Booking flow: `AppointmentService.Create` → `EnqueueBooking` (client confirmation now + reminders at 24h and
+  `settings.notify_reminder_hours` before; pro gets a new-booking ping). Cancellation skips pending rows.
+- Disabled (no-op) when `TELEGRAM_BOT_TOKEN` is empty — dev default. Set `TELEGRAM_BOT_TOKEN` +
+  `TELEGRAM_BOT_USERNAME` (from @BotFather) to enable. SMS channel is stubbed (marked skipped) for later.
+- Frontend: checkout success screen shows a "Підключити Telegram" button (`getTelegramLink()` in lib/api.ts).
 
 ## Domain Model
 - **Roles:** CLIENT | PROFESSIONAL (stored in users.role)

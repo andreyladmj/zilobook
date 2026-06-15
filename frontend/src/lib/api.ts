@@ -90,6 +90,22 @@ export async function createLocation(data: {
   return res.json();
 }
 
+// --- Notifications (Telegram) ---
+
+export interface TelegramLinkResponse {
+  linked: boolean;
+  deep_link?: string;
+}
+
+// Returns a one-time deep link to connect Telegram, or {linked:true} if already done.
+// Returns null if the feature is disabled server-side (no bot configured).
+export async function getTelegramLink(): Promise<TelegramLinkResponse | null> {
+  const res = await authFetch("/api/notifications/telegram/link");
+  if (res.status === 503) return null;
+  if (!res.ok) throw new Error("Failed to get Telegram link");
+  return res.json();
+}
+
 // --- Professional search ---
 
 export interface ProfessionalSearchResult {

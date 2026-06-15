@@ -14,6 +14,10 @@ type Config struct {
 	Port        string
 	CORSOrigins []string
 
+	// Telegram bot (notifications). Empty token disables the whole subsystem.
+	TelegramBotToken    string
+	TelegramBotUsername string
+
 	// Token durations in minutes
 	AccessTokenTTL  int
 	RefreshTokenTTL int
@@ -28,10 +32,12 @@ func Load() *Config {
 	return &Config{
 		DatabaseURL:     getEnv("DATABASE_URL", "postgres://postgres:secret@localhost:5432/zilobook?sslmode=disable"),
 		JWTSecret:       getEnv("JWT_SECRET", devJWTSecret),
-		Port:            getEnv("PORT", "8080"),
-		CORSOrigins:     splitOrigins(getEnv("CORS_ORIGIN", "http://localhost:3000")),
-		AccessTokenTTL:  15,   // 15 minutes
-		RefreshTokenTTL: 10080, // 7 days
+		Port:                getEnv("PORT", "8080"),
+		CORSOrigins:         splitOrigins(getEnv("CORS_ORIGIN", "http://localhost:3000")),
+		TelegramBotToken:    getEnv("TELEGRAM_BOT_TOKEN", ""),
+		TelegramBotUsername: getEnv("TELEGRAM_BOT_USERNAME", ""),
+		AccessTokenTTL:      15,    // 15 minutes
+		RefreshTokenTTL:     10080, // 7 days
 	}
 }
 

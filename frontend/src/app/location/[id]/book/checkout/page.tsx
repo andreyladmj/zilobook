@@ -5,8 +5,50 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { clsx } from "clsx";
 import { ThemeProvider, useTheme, themeForLocationType } from "@/components/ThemeProvider";
-import { createAppointment, fetchLocation } from "@/lib/api";
+import { createAppointment, fetchLocation, getTelegramLink } from "@/lib/api";
 import { isLoggedIn, getUser } from "@/lib/auth";
+
+// Prompt shown after a successful booking: connect Telegram to get reminders.
+function TelegramReminderPrompt() {
+  const { th } = useTheme();
+  const [state, setState] = useState<"loading" | "linked" | "ready" | "hidden">("loading");
+  const [deepLink, setDeepLink] = useState("");
+
+  useEffect(() => {
+    getTelegramLink()
+      .then((res) => {
+        if (!res) { setState("hidden"); return; } // feature disabled server-side
+        if (res.linked) { setState("linked"); return; }
+        setDeepLink(res.deep_link || "");
+        setState("ready");
+      })
+      .catch(() => setState("hidden"));
+  }, []);
+
+  if (state === "hidden" || state === "loading") return null;
+
+  if (state === "linked") {
+    return (
+      <div className={clsx("rounded-2xl p-4 border w-full max-w-sm flex items-center gap-3", th.tabBg, th.border)}>
+        <span className="text-xl">📲</span>
+        <p className={clsx("text-sm font-medium", th.subText)}>Нагадування надійдуть вам у Telegram.</p>
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href={deepLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="w-full max-w-sm flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-white shadow-lg transition-all hover:-translate-y-0.5"
+      style={{ backgroundColor: "#229ED9" }}
+    >
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M21.94 4.6l-3.32 15.66c-.25 1.1-.9 1.38-1.83.86l-5.05-3.72-2.44 2.35c-.27.27-.5.5-1.02.5l.36-5.14L17.4 6.4c.4-.36-.09-.56-.62-.2L6.9 12.56l-4.98-1.56c-1.08-.34-1.1-1.08.23-1.6l19.46-7.5c.9-.33 1.69.2 1.33 1.7z"/></svg>
+      Підключити Telegram для нагадувань
+    </a>
+  );
+}
 
 function CheckoutEngine() {
   const router = useRouter();
@@ -75,6 +117,7 @@ function CheckoutEngine() {
             <span className="font-bold">{rawTime}</span>
           </div>
         </div>
+        <TelegramReminderPrompt />
         <div className="flex gap-3 w-full max-w-sm">
           <button onClick={() => router.push('/dashboard')} className={clsx("flex-1 py-4 font-bold rounded-xl transition-colors", th.brand)}>До кабінету</button>
           <button onClick={() => router.push('/')} className={clsx("py-4 px-6 font-bold rounded-xl transition-colors", th.tabBg)}>На головну</button>

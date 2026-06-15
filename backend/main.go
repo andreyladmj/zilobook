@@ -36,6 +36,7 @@ func main() {
 	settingsRepo := repositories.NewSettingsRepo(db)
 	appointmentRepo := repositories.NewAppointmentRepo(db)
 	scheduleRepo := repositories.NewScheduleRepo(db)
+	notificationRepo := repositories.NewNotificationRepo(db)
 
 	// --- Services ---
 	activitySvc := services.NewActivityService(activityRepo)
@@ -43,7 +44,11 @@ func main() {
 	locationSvc := services.NewLocationService(locationRepo, activitySvc)
 	settingsSvc := services.NewSettingsService(settingsRepo)
 	scheduleSvc := services.NewScheduleService(scheduleRepo, appointmentRepo, settingsRepo, activitySvc)
-	appointmentSvc := services.NewAppointmentService(appointmentRepo, scheduleRepo, settingsRepo, userRepo, phoneRepo, activitySvc)
+	notifySvc := services.NewNotificationService(notificationRepo, userRepo, cfg.TelegramBotToken, cfg.TelegramBotUsername)
+	appointmentSvc := services.NewAppointmentService(appointmentRepo, scheduleRepo, settingsRepo, userRepo, phoneRepo, activitySvc, notifySvc)
+
+	// Start background notification loops (dispatcher + Telegram bot poller)
+	notifySvc.Start()
 
 	// --- Controllers ---
 	authCtrl := controllers.NewAuthController(authService)
@@ -51,9 +56,10 @@ func main() {
 	professionalCtrl := controllers.NewProfessionalController(locationRepo, userRepo)
 	settingsCtrl := controllers.NewSettingsController(settingsSvc)
 	appointmentCtrl := controllers.NewAppointmentController(appointmentSvc, scheduleSvc)
+	notificationCtrl := controllers.NewNotificationController(notifySvc)
 
 	// Setup routes and start server
-	router := routes.Setup(cfg, authCtrl, locationCtrl, professionalCtrl, settingsCtrl, appointmentCtrl)
+	router := routes.Setup(cfg, authCtrl, locationCtrl, professionalCtrl, settingsCtrl, appointmentCtrl, notificationCtrl)
 
 	log.Printf("Zilobook backend starting on port %s", cfg.Port)
 	if err := router.Run(":" + cfg.Port); err != nil {

@@ -29,6 +29,7 @@ type AppointmentService struct {
 	userRepo        *repositories.UserRepo
 	phoneRepo       *repositories.PhoneRepo
 	activitySvc     *ActivityService
+	notifySvc       *NotificationService
 }
 
 func NewAppointmentService(
@@ -38,6 +39,7 @@ func NewAppointmentService(
 	userRepo *repositories.UserRepo,
 	phoneRepo *repositories.PhoneRepo,
 	activitySvc *ActivityService,
+	notifySvc *NotificationService,
 ) *AppointmentService {
 	return &AppointmentService{
 		appointmentRepo: appointmentRepo,
@@ -46,7 +48,21 @@ func NewAppointmentService(
 		userRepo:        userRepo,
 		phoneRepo:       phoneRepo,
 		activitySvc:     activitySvc,
+		notifySvc:       notifySvc,
 	}
+}
+
+// notifyBooking fans out booking notifications (confirmation, reminders, pro ping).
+// Runs off the request path; failures only log.
+func (s *AppointmentService) notifyBooking(appointmentID, professionalID string, clientID *string, start time.Time, confirmed bool) {
+	if s.notifySvc == nil {
+		return
+	}
+	reminderHours := 2
+	if st, err := s.settingsRepo.FindByUserID(professionalID); err == nil && st != nil {
+		reminderHours = st.NotifyReminderHours
+	}
+	s.notifySvc.EnqueueBooking(appointmentID, professionalID, clientID, start, reminderHours, confirmed)
 }
 
 func (s *AppointmentService) Create(callerID, callerRole string, req dto.CreateAppointmentRequest, ip, ua string) (*dto.AppointmentResponse, error) {
@@ -132,6 +148,7 @@ func (s *AppointmentService) Create(callerID, callerRole string, req dto.CreateA
 			return nil, err
 		}
 		s.activitySvc.Log(clientID, "appointment.created", "appointment", &openAppt.ID, nil, ip, ua)
+		go s.notifyBooking(openAppt.ID, req.ProfessionalID, clientID, startTime, status == models.StatusConfirmed)
 		return s.toResponse(updatedAppt)
 	}
 
@@ -150,6 +167,7 @@ func (s *AppointmentService) Create(callerID, callerRole string, req dto.CreateA
 	}
 
 	s.activitySvc.Log(clientID, "appointment.created", "appointment", &appt.ID, nil, ip, ua)
+	go s.notifyBooking(appt.ID, req.ProfessionalID, clientID, startTime, status == models.StatusConfirmed)
 
 	return s.toResponse(appt)
 }
@@ -266,6 +284,9 @@ func (s *AppointmentService) UpdateStatus(userID, appointmentID, newStatus, ip, 
 	switch newStatus {
 	case "Cancelled":
 		action = "appointment.cancelled"
+		if s.notifySvc != nil {
+			s.notifySvc.CancelForAppointment(appointmentID)
+		}
 	case "Completed":
 		action = "appointment.completed"
 	case "NoShow":

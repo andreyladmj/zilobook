@@ -28,10 +28,13 @@ Status legend: `[x]` done · `[ ]` todo · `[~]` partially done.
 - [ ] Client cancellation/reschedule flow with a configurable cutoff (e.g. not later than 24h before)
 
 ### 1.2 Notifications & reminders (the feature people pay for)
-- [ ] notifications table is already in schema — build the dispatch worker (Go goroutine + ticker or cron)
-- [ ] Channel priority for Ukraine: Telegram bot (free) → Viber Business (paid per message) → SMS (TurboSMS/eSputnik, fallback)
-- [ ] Reminder schedule: on booking, 24h before, 2h before (configurable in user_settings)
-- [ ] Telegram bot MVP: client links phone → bot sends confirmations/reminders; pro gets "new booking" pings
+- [x] Dispatch worker: Go goroutine + 60s ticker over the `notifications` queue (migration 000003)
+- [x] Provider-agnostic notifier; Telegram primary (free). `TELEGRAM_BOT_TOKEN` empty = disabled no-op
+- [x] Telegram bot MVP: long-poll `/start <code>` account linking; client confirmation + 24h/Nh reminders; pro new-booking ping
+- [x] Cancellation skips pending reminders; checkout success shows "Підключити Telegram" connect button
+- [ ] Create the real bot via @BotFather, set token + username in server .env, test end-to-end on prod
+- [ ] SMS fallback via TurboSMS (channel is stubbed/skipped today) — add when paying users need it; can be a paid-tier feature
+- [ ] Reminder timing fully configurable in settings UI (24h is currently fixed; short reminder uses notify_reminder_hours)
 
 ### 1.3 Payments
 **Answer to "can we add Google Pay & Apple Pay?" — yes, and almost for free:**

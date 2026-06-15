@@ -16,6 +16,7 @@ func Setup(
 	professionalCtrl *controllers.ProfessionalController,
 	settingsCtrl *controllers.SettingsController,
 	appointmentCtrl *controllers.AppointmentController,
+	notificationCtrl *controllers.NotificationController,
 ) *gin.Engine {
 	router := gin.Default()
 
@@ -53,6 +54,7 @@ func Setup(
 		protected.GET("/users/me/settings", settingsCtrl.Get)
 		protected.PUT("/users/me/settings", settingsCtrl.Update)
 		protected.GET("/users/me/locations", locationCtrl.ListByOwner)
+		protected.GET("/notifications/telegram/link", notificationCtrl.GetTelegramLink)
 		protected.GET("/professionals/search", professionalCtrl.Search)
 		protected.GET("/professionals/my-staff", professionalCtrl.ListMyStaff)
 		protected.POST("/professionals/link", professionalCtrl.LinkToLocation)
