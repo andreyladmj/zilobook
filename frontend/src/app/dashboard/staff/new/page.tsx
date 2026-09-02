@@ -58,19 +58,19 @@ export default function NewStaffPage() {
         <button onClick={() => router.back()} className={clsx("w-10 h-10 flex items-center justify-center rounded-xl border transition-colors hover:opacity-80", th.cardBg, th.border, th.text)}>
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </button>
-        <h1 className="text-3xl font-bold tracking-tight">Link Professional</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Додати майстра</h1>
       </div>
 
       <div className={clsx("rounded-2xl border shadow-sm p-6 md:p-8 space-y-8", th.cardBg, th.border)}>
         {/* Info */}
         <div className={clsx("p-4 rounded-xl border", th.infoBox)}>
-          <p className="text-sm font-medium">Search for a registered Zilobook professional by name, phone, or email. Then assign them to your locations.</p>
+          <p className="text-sm font-medium">Знайдіть зареєстрованого в Zilobook майстра за іменем, телефоном або email — і прив&apos;яжіть до своїх локацій.</p>
         </div>
 
         {/* Success */}
         {success && (
           <div className={clsx("p-4 rounded-xl text-sm text-center font-semibold", th.successText, "bg-emerald-500/10 border border-emerald-500/20")}>
-            Professional linked successfully! Redirecting...
+            Майстра додано! Перенаправляємо...
           </div>
         )}
 
@@ -82,7 +82,7 @@ export default function NewStaffPage() {
         {selected ? (
           <div className="space-y-6">
             <div>
-              <p className={clsx("text-[11px] font-bold uppercase tracking-widest mb-3", th.subText)}>Selected Professional</p>
+              <p className={clsx("text-[11px] font-bold uppercase tracking-widest mb-3", th.subText)}>Обраний майстер</p>
               <div className={clsx("flex items-center gap-4 p-4 rounded-xl border-2", th.border)}>
                 <div className={clsx("w-14 h-14 rounded-xl flex items-center justify-center font-bold overflow-hidden flex-shrink-0", th.tabBg)}>
                   {selected.profile_image_url ? (
@@ -93,7 +93,7 @@ export default function NewStaffPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-base">{selected.full_name}</p>
-                  <p className={clsx("text-sm", th.subText)}>{selected.phone || selected.email || "Professional"}</p>
+                  <p className={clsx("text-sm", th.subText)}>{selected.phone || selected.email || "Майстер"}</p>
                 </div>
                 <button onClick={() => { setSelected(null); setCheckedLocations(new Set()); setError(""); setSuccess(false); }} className={clsx("p-2 rounded-xl transition-colors", th.tabBg)}>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
@@ -103,12 +103,12 @@ export default function NewStaffPage() {
 
             {/* Location Assignment */}
             <div className={clsx("pt-6 border-t", th.border)}>
-              <p className={clsx("text-[11px] font-bold uppercase tracking-widest mb-4", th.subText)}>Assign to Locations</p>
+              <p className={clsx("text-[11px] font-bold uppercase tracking-widest mb-4", th.subText)}>Прив&apos;язати до локацій</p>
               {locations.length === 0 ? (
                 <div className="text-center py-6 space-y-3">
-                  <p className={clsx("text-sm", th.subText)}>You don&apos;t have any locations yet.</p>
+                  <p className={clsx("text-sm", th.subText)}>У вас поки немає локацій.</p>
                   <button onClick={() => router.push("/dashboard/locations/new")} className={clsx("px-5 py-2.5 rounded-xl font-bold text-sm", th.brand)}>
-                    Create a Location First
+                    Спочатку створіть локацію
                   </button>
                 </div>
               ) : (
@@ -143,20 +143,20 @@ export default function NewStaffPage() {
               className={clsx("w-full py-4 rounded-xl font-bold tracking-wide transition-colors disabled:opacity-50 flex items-center justify-center gap-2", th.brand)}
             >
               {linking ? (
-                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Linking...</>
+                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> Додаємо...</>
               ) : success ? (
-                <><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg> Linked!</>
+                <><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg> Готово!</>
               ) : (
-                `Link to ${checkedLocations.size} Location${checkedLocations.size !== 1 ? "s" : ""}`
+                `Прив'язати до локацій: ${checkedLocations.size}`
               )}
             </button>
           </div>
         ) : (
           /* Search Mode */
           <div>
-            <p className={clsx("text-[11px] font-bold uppercase tracking-widest mb-3", th.subText)}>Find Professional</p>
+            <p className={clsx("text-[11px] font-bold uppercase tracking-widest mb-3", th.subText)}>Знайти майстра</p>
             <SearchList<ProfessionalSearchResult>
-              placeholder="Search by name, phone, or email..."
+              placeholder="Ім'я, телефон або email..."
               perPage={10}
               fetcher={fetcher}
               renderItem={(pro) => (
@@ -177,7 +177,7 @@ export default function NewStaffPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-sm">{pro.full_name}</p>
-                    <p className={clsx("text-xs truncate", th.subText)}>{pro.phone || pro.email || "Professional"}</p>
+                    <p className={clsx("text-xs truncate", th.subText)}>{pro.phone || pro.email || "Майстер"}</p>
                   </div>
                   <svg className={clsx("w-5 h-5 flex-shrink-0", th.subText)} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
                 </button>

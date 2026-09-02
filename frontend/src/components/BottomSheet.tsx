@@ -19,6 +19,14 @@ export type ClientData = {
   blockReason?: string;
 }
 
+// API status values stay English; this is display-only
+const STATUS_UA: Record<string, string> = {
+  Confirmed: "Підтверджено",
+  Pending: "Очікує",
+  Cancelled: "Скасовано",
+  Completed: "Завершено",
+};
+
 interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
@@ -102,23 +110,23 @@ export default function BottomSheet({ isOpen, onClose, client, onConfirm, onCanc
           <div className="space-y-6">
              <div className="flex justify-between items-start">
                <div>
-                 <h3 className="text-2xl font-bold tracking-tight">{client.blockReason || client.client || "Blocked Time"}</h3>
-                 <p className={clsx("font-medium mt-1", th.subText)}>Personal or Unavailable</p>
+                 <h3 className="text-2xl font-bold tracking-tight">{client.blockReason || client.client || "Заблокований час"}</h3>
+                 <p className={clsx("font-medium mt-1", th.subText)}>Особистий час або недоступно</p>
                </div>
                <span className={clsx("px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-xl", th.tabBg, th.subText)}>
-                 Block
+                 Блок
                </span>
              </div>
              <div className="pt-4 flex flex-col gap-3">
                <button onClick={() => { onClose(); router.push('/dashboard/calendar/new'); }} className={clsx("w-full py-4 rounded-2xl font-bold transition-colors", th.brand)}>
-                 Edit Block
+                 Редагувати блок
                </button>
                <button
                  onClick={handleDeleteBlock}
                  disabled={actionLoading === "deleteBlock"}
                  className={clsx("w-full py-4 rounded-2xl font-bold transition-colors disabled:opacity-50", th.dangerBg)}
                >
-                 {actionLoading === "deleteBlock" ? "Removing..." : "Remove Block"}
+                 {actionLoading === "deleteBlock" ? "Видаляємо..." : "Видалити блок"}
                </button>
              </div>
           </div>
@@ -136,24 +144,24 @@ export default function BottomSheet({ isOpen, onClose, client, onConfirm, onCanc
                  client.status === 'Cancelled' ? 'bg-red-500/10 text-red-500' :
                  client.status === 'Confirmed' ? clsx(th.tabBg, th.text) : th.pendingBadge
                )}>
-                 {client.status}
+                 {client.status ? STATUS_UA[client.status] ?? client.status : ""}
                </span>
              </div>
 
              {client.locationName && (
-               <p className={clsx("text-sm font-medium", th.subText)}>Location: {client.locationName}</p>
+               <p className={clsx("text-sm font-medium", th.subText)}>Локація: {client.locationName}</p>
              )}
 
              {client.notes && (
                <div className={clsx("p-4 rounded-2xl border", th.tabBg, th.border)}>
-                  <p className={clsx("text-xs font-bold uppercase tracking-widest mb-2", th.subText)}>Notes</p>
+                  <p className={clsx("text-xs font-bold uppercase tracking-widest mb-2", th.subText)}>Нотатки</p>
                   <p className="text-sm">{client.notes}</p>
                </div>
              )}
 
              {client.attendees && (
                <div className={clsx("p-4 rounded-2xl border", th.tabBg, th.border)}>
-                  <p className={clsx("text-xs font-bold uppercase tracking-widest mb-2", th.subText)}>Group Attendees</p>
+                  <p className={clsx("text-xs font-bold uppercase tracking-widest mb-2", th.subText)}>Учасники групи</p>
                   <ul className="space-y-2">
                     {client.attendees.map((a, i) => (
                       <li key={i} className={clsx("text-sm font-medium border-b pb-2 last:border-0", th.border)}>{a.name}</li>
@@ -169,27 +177,27 @@ export default function BottomSheet({ isOpen, onClose, client, onConfirm, onCanc
                     disabled={!!actionLoading}
                     className={clsx("w-full py-4 rounded-2xl text-white font-bold transition-colors disabled:opacity-50", th.successBg)}
                   >
-                    {actionLoading === "confirm" ? "Confirming..." : "Confirm Appointment"}
+                    {actionLoading === "confirm" ? "Підтверджуємо..." : "Підтвердити запис"}
                   </button>
                )}
                <button
                  onClick={handleReschedule}
                  className={clsx("w-full py-4 rounded-2xl font-bold transition-colors", th.brand)}
                >
-                 Edit/Reschedule
+                 Редагувати / Перенести
                </button>
                <button
                  onClick={() => { onClose(); router.push('/dashboard/calendar/new'); }}
                  className={clsx("w-full py-4 rounded-2xl border font-bold transition-colors", th.cardBg, th.border, th.text)}
                >
-                 Add a new event
+                 Додати нову подію
                </button>
                <button
                  onClick={handleCancel}
                  disabled={!!actionLoading}
                  className={clsx("w-full py-4 rounded-2xl font-bold transition-colors disabled:opacity-50", th.dangerBg)}
                >
-                 {actionLoading === "cancel" ? "Cancelling..." : `Cancel & Notify ${client.attendees ? 'All' : 'Client'}`}
+                 {actionLoading === "cancel" ? "Скасовуємо..." : `Скасувати ${client.attendees ? "та сповістити всіх" : "та сповістити клієнта"}`}
                </button>
              </div>
           </div>

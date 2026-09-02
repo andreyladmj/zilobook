@@ -119,7 +119,7 @@ function CheckoutEngine() {
         </div>
         <TelegramReminderPrompt />
         <div className="flex gap-3 w-full max-w-sm">
-          <button onClick={() => router.push('/dashboard')} className={clsx("flex-1 py-4 font-bold rounded-xl transition-colors", th.brand)}>До кабінету</button>
+          <button onClick={() => router.push('/bookings')} className={clsx("flex-1 py-4 font-bold rounded-xl transition-colors", th.brand)}>Мої записи</button>
           <button onClick={() => router.push('/')} className={clsx("py-4 px-6 font-bold rounded-xl transition-colors", th.tabBg)}>На головну</button>
         </div>
       </div>

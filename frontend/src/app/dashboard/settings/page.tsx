@@ -108,39 +108,39 @@ export default function SettingsPage() {
     }
   };
 
-  if (loading) return <div className={clsx("p-10 text-center font-semibold", th.subText)}>Loading settings...</div>;
+  if (loading) return <div className={clsx("p-10 text-center font-semibold", th.subText)}>Завантажуємо налаштування...</div>;
 
   return (
     <div className="p-6 md:p-10 max-w-3xl mx-auto space-y-8 relative pb-24 min-h-screen">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className={clsx("mt-1 font-medium", th.subText)}>Configure your profile and booking preferences.</p>
+        <h1 className="text-3xl font-bold tracking-tight">Налаштування</h1>
+        <p className={clsx("mt-1 font-medium", th.subText)}>Профіль і правила запису.</p>
       </div>
 
       <div className={clsx("rounded-2xl border shadow-sm p-6 md:p-8 space-y-8", th.cardBg, th.border)}>
 
          {success && (
-           <div className={clsx("p-3 rounded-xl text-sm text-center font-semibold", th.successText, "bg-emerald-500/10 border border-emerald-500/20")}>Settings saved successfully!</div>
+           <div className={clsx("p-3 rounded-xl text-sm text-center font-semibold", th.successText, "bg-emerald-500/10 border border-emerald-500/20")}>Налаштування збережено!</div>
          )}
 
          {/* Profile */}
          <div className={clsx("pb-6 border-b", th.border)}>
-            <h3 className="font-bold text-lg mb-4">Profile</h3>
+            <h3 className="font-bold text-lg mb-4">Профіль</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-1", th.subText)}>Name</label>
+                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-1", th.subText)}>Ім&apos;я</label>
                 <p className="font-semibold">{user?.full_name || "—"}</p>
               </div>
               <div>
-                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-1", th.subText)}>Role</label>
-                <p className="font-semibold">{user?.role || "—"}</p>
+                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-1", th.subText)}>Роль</label>
+                <p className="font-semibold">{user?.role === "PROFESSIONAL" ? "Майстер" : user?.role === "CLIENT" ? "Клієнт" : "—"}</p>
               </div>
             </div>
          </div>
 
          {/* Theme */}
          <div className={clsx("pb-6 border-b", th.border)}>
-            <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-3", th.subText)}>Theme</label>
+            <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-3", th.subText)}>Тема</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
               {(Object.keys(THEMES) as ThemeKey[]).map(t => {
                 const isActive = themeId === t;
@@ -174,12 +174,12 @@ export default function SettingsPage() {
 
          {/* Booking Rules */}
          <div className={clsx("pb-6 border-b", th.border)}>
-            <h3 className="font-bold text-lg mb-6">Booking Rules</h3>
+            <h3 className="font-bold text-lg mb-6">Правила запису</h3>
             <div className="space-y-6">
                <label className="flex items-center justify-between cursor-pointer">
                   <div>
-                     <p className="font-bold">Allow Self-Booking</p>
-                     <p className={clsx("text-sm", th.subText)}>Clients can book slots without your approval.</p>
+                     <p className="font-bold">Самостійний запис</p>
+                     <p className={clsx("text-sm", th.subText)}>Клієнти можуть записуватися без вашого схвалення.</p>
                   </div>
                   <div className={clsx("w-14 h-8 rounded-full p-1 transition-colors cursor-pointer", allowSelfBooking ? "bg-emerald-500" : th.tabBg)} onClick={() => setAllowSelfBooking(!allowSelfBooking)}>
                      <div className={`w-6 h-6 bg-white rounded-full shadow transition-transform ${allowSelfBooking ? 'translate-x-6' : 'translate-x-0'}`} />
@@ -188,8 +188,8 @@ export default function SettingsPage() {
 
                <label className="flex items-center justify-between cursor-pointer">
                   <div>
-                     <p className="font-bold">Require Approval</p>
-                     <p className={clsx("text-sm", th.subText)}>New bookings start as &quot;Pending&quot; until you confirm.</p>
+                     <p className="font-bold">Підтвердження записів</p>
+                     <p className={clsx("text-sm", th.subText)}>Нові записи чекають на ваше підтвердження.</p>
                   </div>
                   <div className={clsx("w-14 h-8 rounded-full p-1 transition-colors cursor-pointer", requireApproval ? "bg-emerald-500" : th.tabBg)} onClick={() => setRequireApproval(!requireApproval)}>
                      <div className={`w-6 h-6 bg-white rounded-full shadow transition-transform ${requireApproval ? 'translate-x-6' : 'translate-x-0'}`} />
@@ -198,23 +198,23 @@ export default function SettingsPage() {
 
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                  <div>
-                   <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Min Lead Time (hours)</label>
+                   <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Не пізніше ніж за (годин)</label>
                    <input type="number" value={minLeadHours} onChange={e => setMinLeadHours(Number(e.target.value))} min={0} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)} />
                  </div>
                  <div>
-                   <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Max Advance (days)</label>
+                   <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Не раніше ніж за (днів)</label>
                    <input type="number" value={maxAdvanceDays} onChange={e => setMaxAdvanceDays(Number(e.target.value))} min={1} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)} />
                  </div>
                  <div>
-                   <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Slot Duration (minutes)</label>
+                   <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Тривалість слота (хвилин)</label>
                    <input type="number" value={slotDuration} onChange={e => setSlotDuration(Number(e.target.value))} min={15} step={15} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)} />
                  </div>
                  <div>
-                   <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Gap Between Slots (min)</label>
+                   <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Перерва між слотами (хв)</label>
                    <input type="number" value={slotGap} onChange={e => setSlotGap(Number(e.target.value))} min={0} step={5} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)} />
                  </div>
                  <div className="md:col-span-2">
-                   <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Cancellation Window (hours)</label>
+                   <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Скасування не пізніше ніж за (годин)</label>
                    <input type="number" value={cancellationHours} onChange={e => setCancellationHours(Number(e.target.value))} min={0} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)} />
                  </div>
                </div>
@@ -225,12 +225,12 @@ export default function SettingsPage() {
          {locations.length > 0 && (
            <div className="space-y-6">
               <div>
-                <h3 className="font-bold text-lg">Working Hours</h3>
-                <p className={clsx("text-sm mt-1", th.subText)}>Configure your weekly availability per location.</p>
+                <h3 className="font-bold text-lg">Робочі години</h3>
+                <p className={clsx("text-sm mt-1", th.subText)}>Ваш тижневий графік по кожній локації.</p>
               </div>
 
               <div>
-                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Select Location</label>
+                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Локація</label>
                 <select
                   value={selectedLocId}
                   onChange={e => setSelectedLocId(e.target.value)}
@@ -241,7 +241,7 @@ export default function SettingsPage() {
               </div>
 
               <div className="space-y-3">
-                {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map((dayName, index) => {
+                {["Неділя", "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота"].map((dayName, index) => {
                   const activeRecord = workingHours.find(wh => wh.location_id === selectedLocId && wh.day_of_week === index);
                   const isEnabled = !!activeRecord;
                   const startTime = activeRecord?.start_time || "09:00";
@@ -288,7 +288,7 @@ export default function SettingsPage() {
                             onChange={e => updateTime("start_time", e.target.value)}
                             className={clsx("px-3 py-1.5 rounded-lg border text-sm font-semibold focus:outline-none focus:ring-1", th.inputBg, th.border)}
                           />
-                          <span className={clsx("text-xs font-bold", th.subText)}>to</span>
+                          <span className={clsx("text-xs font-bold", th.subText)}>до</span>
                           <input
                             type="time"
                             value={endTime}
@@ -305,7 +305,7 @@ export default function SettingsPage() {
          )}
 
          <button onClick={handleSave} disabled={saving} className={clsx("w-full py-4 mt-4 rounded-xl font-bold tracking-wide transition-colors shadow-sm disabled:opacity-50", th.brand)}>
-           {saving ? "Saving..." : "Save Settings"}
+           {saving ? "Зберігаємо..." : "Зберегти налаштування"}
          </button>
       </div>
     </div>

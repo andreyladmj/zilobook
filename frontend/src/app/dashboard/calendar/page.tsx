@@ -8,6 +8,8 @@ import { useTheme, THEMES, type ThemeKey } from "@/components/ThemeProvider";
 import { fetchMyAppointments, fetchMyLocations, updateAppointmentStatus, deleteScheduleBlock, type AppointmentResponse, type Location } from "@/lib/api";
 import { kyivToday, kyivNow } from "@/lib/kyivtime";
 
+const VIEW_UA: Record<"Day" | "Week" | "Month", string> = { Day: "День", Week: "Тиждень", Month: "Місяць" };
+
 type ScheduleItem = {
   id: string;
   hour: string;
@@ -35,7 +37,7 @@ export default function CalendarPage() {
   // Dynamic Date State. Appointment times are fake-UTC (pro's wall clock),
   // so "today" must come from Kyiv wall time, not the browser or real UTC.
   const [currentDate, setCurrentDate] = useState(() => new Date(kyivToday() + "T00:00:00Z"));
-  const currentDateString = currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  const currentDateString = currentDate.toLocaleDateString("uk-UA", { month: "long", year: "numeric", timeZone: "UTC" });
 
   const [appointments, setAppointments] = useState<AppointmentResponse[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -85,7 +87,7 @@ export default function CalendarPage() {
       day: start.getUTCDate(),
       month: start.getUTCMonth(),
       client: a.client.full_name,
-      service: "Appointment",
+      service: "Запис",
       status: a.status,
       duration: durStr,
       phone: a.client.phone || "",
@@ -175,7 +177,7 @@ export default function CalendarPage() {
     d.setUTCDate(weekStart.getUTCDate() + i);
     const isToday = d.getUTCDate() === today.getUTCDate() && d.getUTCMonth() === today.getUTCMonth() && d.getUTCFullYear() === today.getUTCFullYear();
     return {
-      day: d.toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }),
+      day: d.toLocaleDateString("uk-UA", { weekday: "short", timeZone: "UTC" }),
       date: String(d.getUTCDate()),
       dateNum: d.getUTCDate(),
       dateMonth: d.getUTCMonth(),
@@ -226,13 +228,13 @@ export default function CalendarPage() {
                 onChange={e => setSelectedLocationId(e.target.value)}
                 className={clsx("px-3 py-1.5 text-sm font-bold rounded-lg border", th.inputBg, th.border)}
               >
-                <option value="all">All Locations</option>
+                <option value="all">Всі локації</option>
                 {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
               </select>
 
               <div className={clsx("hidden md:flex p-1 rounded-xl", th.tabBg)}>
-                {["Day", "Week", "Month"].map((v) => (
-                   <button key={v} onClick={() => setView(v as any)} className={clsx("px-4 py-1.5 rounded-lg text-sm font-bold transition-all", view === v ? th.activeTab : "opacity-60 hover:opacity-100")}>{v}</button>
+                {(["Day", "Week", "Month"] as const).map((v) => (
+                   <button key={v} onClick={() => setView(v)} className={clsx("px-4 py-1.5 rounded-lg text-sm font-bold transition-all", view === v ? th.activeTab : "opacity-60 hover:opacity-100")}>{VIEW_UA[v]}</button>
                 ))}
               </div>
               <div className="hidden lg:flex items-center gap-1.5">
@@ -244,8 +246,8 @@ export default function CalendarPage() {
         </div>
 
         <div className={clsx("md:hidden flex p-1 mx-4 mb-4 rounded-xl", th.tabBg)}>
-           {["Day", "Week", "Month"].map((v) => (
-              <button key={v} onClick={() => setView(v as any)} className={clsx("flex-1 py-1.5 rounded-lg text-sm font-bold transition-all", view === v ? th.activeTab : "opacity-60 hover:opacity-100")}>{v}</button>
+           {(["Day", "Week", "Month"] as const).map((v) => (
+              <button key={v} onClick={() => setView(v)} className={clsx("flex-1 py-1.5 rounded-lg text-sm font-bold transition-all", view === v ? th.activeTab : "opacity-60 hover:opacity-100")}>{VIEW_UA[v]}</button>
            ))}
         </div>
       </div>
@@ -274,8 +276,8 @@ export default function CalendarPage() {
                                <div key={slot.id} onClick={() => setSelectedClient(toClientData(slot))} className={clsx("rounded-2xl flex flex-col justify-center px-5 py-3 cursor-pointer transition-transform hover:scale-[1.01]", slotStyle(slot.status))}>
                                   <div className="flex justify-between items-start">
                                      <span className="text-lg font-bold tracking-tight">{slot.client}</span>
-                                     {slot.status === 'Pending' && <span className="text-[10px] uppercase tracking-wider font-bold text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-lg">Pending</span>}
-                                     {slot.status === 'Cancelled' && <span className="text-[10px] uppercase tracking-wider font-bold text-red-500 bg-red-500/10 px-2.5 py-1 rounded-lg">Cancelled</span>}
+                                     {slot.status === 'Pending' && <span className="text-[10px] uppercase tracking-wider font-bold text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-lg">Очікує</span>}
+                                     {slot.status === 'Cancelled' && <span className="text-[10px] uppercase tracking-wider font-bold text-red-500 bg-red-500/10 px-2.5 py-1 rounded-lg">Скасовано</span>}
                                   </div>
                                   <span className="text-sm mt-1 font-medium opacity-80">{slot.service} • {slot.duration}{slot.locationName ? ` • ${slot.locationName}` : ""}</span>
                                </div>
@@ -336,7 +338,7 @@ export default function CalendarPage() {
            <div className="p-4 w-full">
               <div className={clsx("rounded-3xl border shadow-sm overflow-hidden", th.cardBg, th.border)}>
                  <div className={clsx("grid grid-cols-7 border-b", th.border, th.dayCol)}>
-                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(d => (
+                    {["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"].map(d => (
                        <div key={d} className="py-3 text-center text-xs font-extrabold uppercase">{d}</div>
                     ))}
                  </div>
@@ -388,21 +390,21 @@ export default function CalendarPage() {
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMonthEventsDay(null)} />
             <div className={clsx("relative w-full max-w-sm rounded-[32px] p-6 shadow-2xl flex flex-col max-h-[80vh]", th.cardBg, th.text)}>
                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold">Events for {currentDate.toLocaleDateString("en-US", { month: "long", timeZone: "UTC" })} {monthEventsDay}</h3>
+                  <h3 className="text-xl font-bold">Події за {monthEventsDay} {currentDate.toLocaleDateString("uk-UA", { month: "long", timeZone: "UTC" })}</h3>
                   <button onClick={() => setMonthEventsDay(null)} className={clsx("p-2 rounded-full transition-colors", th.tabBg)}>
                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
                   </button>
                </div>
                <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-3 mb-6">
                   {schedule.filter(s => s.day === monthEventsDay && s.month === month).length === 0 && (
-                     <p className={clsx("text-sm text-center py-8", th.subText)}>No events scheduled for this day.</p>
+                     <p className={clsx("text-sm text-center py-8", th.subText)}>На цей день подій немає.</p>
                   )}
                   {schedule.filter(s => s.day === monthEventsDay && s.month === month).map((slot, i) => (
                      <div key={i} onClick={() => { setMonthEventsDay(null); setSelectedClient(toClientData(slot)); }} className={clsx("p-4 rounded-xl border cursor-pointer hover:opacity-80 transition-opacity",
                        slot.status === "Cancelled" ? "border-red-200 bg-red-50/50 opacity-60" : th.border
                      )}>
                         <div className="font-bold flex items-center justify-between">
-                           <span className={slot.status === "Cancelled" ? "line-through text-red-400" : ""}>{slot.client || "Blocked Time"}</span>
+                           <span className={slot.status === "Cancelled" ? "line-through text-red-400" : ""}>{slot.client || "Заблокований час"}</span>
                            <span className={clsx("text-xs px-2 py-1 rounded-md font-semibold", th.tabBg, th.subText)}>{slot.hour}</span>
                         </div>
                         <div className={clsx("text-xs mt-1.5 font-medium", th.subText)}>

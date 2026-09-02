@@ -79,6 +79,8 @@ frontend/src/
 │   ├── login/           # Phone or email login → stores JWT
 │   ├── dashboard/       # Protected (redirects to /login if no token), shows real user data
 │   ├── explore/         # Public location discovery (HIDDEN: FEATURES.marketplace=false, reachable by URL)
+│   ├── b/[slug]/        # Short booking link (Instagram bio) → resolves slug, redirects to booking flow
+│   ├── bookings/        # Client cabinet: my appointments + cancel/reschedule (window enforced server-side)
 │   ├── location/[id]/   # Location detail + booking flow
 │   └── (landing pages)  # / resolves niche by Host header; /fitness, /beauty, /service redirect with ?theme=
 ```

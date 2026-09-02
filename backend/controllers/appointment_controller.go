@@ -120,9 +120,13 @@ func (ac *AppointmentController) Reschedule(c *gin.Context) {
 		case errors.Is(err, services.ErrNotAuthorized):
 			utils.Error(c, http.StatusForbidden, "Not authorized")
 		case errors.Is(err, services.ErrTimeConflict):
-			utils.Error(c, http.StatusConflict, "Time slot already booked")
+			utils.Error(c, http.StatusConflict, "Цей час уже зайнято")
 		case errors.Is(err, services.ErrInvalidTimeRange):
 			utils.Error(c, http.StatusBadRequest, "End time must be after start time")
+		case errors.Is(err, services.ErrCancellationWindow):
+			utils.Error(c, http.StatusBadRequest, "Час для перенесення вже минув")
+		case errors.Is(err, services.ErrTooSoon):
+			utils.Error(c, http.StatusBadRequest, "Новий час занадто близько — оберіть пізніший слот")
 		default:
 			utils.Error(c, http.StatusInternalServerError, err.Error())
 		}
@@ -169,6 +173,10 @@ func (ac *AppointmentController) UpdateStatus(c *gin.Context) {
 			utils.Error(c, http.StatusForbidden, "Not authorized")
 		case errors.Is(err, services.ErrInvalidStatus):
 			utils.Error(c, http.StatusBadRequest, "Invalid status")
+		case errors.Is(err, services.ErrClientStatusChange):
+			utils.Error(c, http.StatusForbidden, "Ви можете лише скасувати запис")
+		case errors.Is(err, services.ErrCancellationWindow):
+			utils.Error(c, http.StatusBadRequest, "Час для скасування вже минув")
 		default:
 			utils.Error(c, http.StatusInternalServerError, "Failed to update status")
 		}

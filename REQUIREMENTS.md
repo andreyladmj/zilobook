@@ -25,7 +25,7 @@ Status legend: `[x]` done · `[ ]` todo · `[~]` partially done.
 - [x] Public booking link short URL `/b/[slug]` — resolves title_slug via GET /api/locations/slug/:slug and lands on the booking flow; works without login
 - [ ] Anonymized public calendar (booked slots = generic blocks, no client names/phones) — already a stated principle, verify it holds
 - [ ] Appointment statuses lifecycle (pending → confirmed → completed/cancelled/no-show) with `no-show` as an explicit status (feeds future analytics: "X UAH saved")
-- [ ] Client cancellation/reschedule flow with a configurable cutoff (e.g. not later than 24h before)
+- [x] Client cancellation/reschedule flow: /bookings page (list, cancel, reschedule via slot picker); server enforces cancellation_window_hours + min lead on the new time; reminders re-enqueued on reschedule; clients can ONLY cancel (not set other statuses)
 
 ### 1.2 Notifications & reminders (the feature people pay for)
 - [x] Dispatch worker: Go goroutine + 60s ticker over the `notifications` queue (migration 000003)
@@ -50,7 +50,7 @@ Ukrainian PSPs (WayForPay, LiqPay/Privat, Fondy, monobank acquiring) all ship **
 ### 1.4 Localization
 - [x] Ukrainian UI for public pages: landing, location page, booking flow, checkout, login/register; `lang="uk"`, UA metadata
 - [x] Demo calendar events in `LandingClient.tsx` localized per niche, 24h time format, ₴ in demo data
-- [ ] Dashboard (pro cabinet) localization — still English
+- [x] Dashboard (pro cabinet) localization — Ukrainian (all pages, BottomSheet, SearchList, api.ts error fallbacks; /explore left English behind the marketplace flag)
 - [ ] Notifications/emails in Ukrainian (when notifications exist)
 - [ ] Phone input mask +380, validation server-side
 

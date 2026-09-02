@@ -23,27 +23,27 @@ export default function LocationsPage() {
     <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8 relative pb-24 min-h-screen">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Facilities & Locations</h1>
-          <p className={clsx("mt-1 font-medium", th.subText)}>Manage physical addresses where services are provided.</p>
+          <h1 className="text-3xl font-bold tracking-tight">Локації</h1>
+          <p className={clsx("mt-1 font-medium", th.subText)}>Адреси, за якими ви надаєте послуги.</p>
         </div>
         <button
           onClick={() => router.push('/dashboard/locations/new')}
           className={clsx("px-5 py-2.5 rounded-xl font-bold text-sm transition-colors", th.brand)}
         >
-           + Add Location
+           + Додати локацію
         </button>
       </div>
 
       {loading ? (
-        <div className={clsx("text-center py-20 font-semibold", th.subText)}>Loading...</div>
+        <div className={clsx("text-center py-20 font-semibold", th.subText)}>Завантаження...</div>
       ) : locations.length === 0 ? (
         <div className="text-center py-20 space-y-4">
-          <p className={clsx("font-semibold", th.subText)}>No locations yet.</p>
+          <p className={clsx("font-semibold", th.subText)}>Локацій поки немає.</p>
           <button
             onClick={() => router.push('/dashboard/locations/new')}
             className={clsx("px-5 py-2.5 rounded-xl font-bold text-sm", th.brand)}
           >
-            Add your first location
+            Додати першу локацію
           </button>
         </div>
       ) : (
@@ -54,7 +54,7 @@ export default function LocationsPage() {
                     {loc.images?.length > 0 ? (
                       <img src={loc.images[0].image_url} alt={loc.name} className="w-full h-full object-cover" />
                     ) : (
-                      <span className={clsx("font-bold text-sm uppercase tracking-widest px-4 py-2 border-2 border-dashed rounded-lg", th.border, th.subText)}>No Photo</span>
+                      <span className={clsx("font-bold text-sm uppercase tracking-widest px-4 py-2 border-2 border-dashed rounded-lg", th.border, th.subText)}>Без фото</span>
                     )}
                  </div>
                  <div className="p-5">

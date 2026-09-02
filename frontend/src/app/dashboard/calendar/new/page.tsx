@@ -148,7 +148,7 @@ function NewSlotForm() {
            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
         </button>
         <h1 className="text-3xl font-bold tracking-tight">
-          {isEditMode ? "Reschedule Appointment" : "Create New Slot"}
+          {isEditMode ? "Перенести запис" : "Новий слот"}
         </h1>
       </div>
 
@@ -160,7 +160,7 @@ function NewSlotForm() {
          {/* Edit mode info */}
          {isEditMode && editAppt && (
            <div className={clsx("p-4 rounded-xl border", th.tabBg, th.border)}>
-             <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", th.subText)}>Rescheduling</p>
+             <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", th.subText)}>Переносимо запис</p>
              <p className="font-bold">{editAppt.client.full_name} — {editAppt.client.phone}</p>
            </div>
          )}
@@ -168,10 +168,10 @@ function NewSlotForm() {
          {/* Type Selector (only in create mode) */}
          {!isEditMode && (
          <div>
-            <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Slot Type</label>
+            <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Тип слота</label>
             <div className={clsx("flex p-1 rounded-xl", th.tabBg)}>
-              <button onClick={() => setSlotType("individual")} className={clsx("flex-1 py-2.5 text-sm font-semibold z-10 rounded-lg transition-colors", slotType === "individual" ? th.activeTab : th.subText)}>Appointment</button>
-              <button onClick={() => setSlotType("block")} className={clsx("flex-1 py-2.5 text-sm font-semibold z-10 rounded-lg transition-colors", slotType === "block" ? th.activeTab : th.subText)}>Block Time</button>
+              <button onClick={() => setSlotType("individual")} className={clsx("flex-1 py-2.5 text-sm font-semibold z-10 rounded-lg transition-colors", slotType === "individual" ? th.activeTab : th.subText)}>Запис</button>
+              <button onClick={() => setSlotType("block")} className={clsx("flex-1 py-2.5 text-sm font-semibold z-10 rounded-lg transition-colors", slotType === "block" ? th.activeTab : th.subText)}>Блок часу</button>
             </div>
          </div>
          )}
@@ -179,57 +179,57 @@ function NewSlotForm() {
          <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Date</label>
+                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Дата</label>
                 <input type="date" value={date} onChange={e => setDate(e.target.value)} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)} />
               </div>
               <div>
-                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Start Time</label>
+                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Початок</label>
                 <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)} step="300" />
               </div>
             </div>
 
             <div>
-              <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Duration</label>
+              <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Тривалість</label>
               <input type="time" value={duration} onChange={e => setDuration(e.target.value)} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)} step="300" />
-              <p className={clsx("text-xs mt-1", th.subText)}>End time: {computeEndTime()}</p>
+              <p className={clsx("text-xs mt-1", th.subText)}>Кінець: {computeEndTime()}</p>
             </div>
 
             {/* Appointment-specific fields */}
             {slotType === "individual" && !isEditMode && (
               <>
                 <div>
-                  <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Location</label>
+                  <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Локація</label>
                   <select value={selectedLocationId} onChange={e => setSelectedLocationId(e.target.value)} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)}>
-                    <option value="">Select location...</option>
+                    <option value="">Оберіть локацію...</option>
                     {locations.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Client</label>
+                  <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Клієнт</label>
                   <select value={selectedClientId} onChange={e => setSelectedClientId(e.target.value)} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)}>
-                    <option value="">Open Slot (no client yet)</option>
+                    <option value="">Відкритий слот (без клієнта)</option>
                     {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
-                  <p className={clsx("text-xs mt-1", th.subText)}>Leave empty to create an open slot that clients can book later.</p>
+                  <p className={clsx("text-xs mt-1", th.subText)}>Залиште порожнім — клієнти зможуть записатися на цей час самі.</p>
                 </div>
               </>
             )}
 
             {slotType === "block" && !isEditMode && (
               <div>
-                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Reason (Optional)</label>
-                <input type="text" value={reason} onChange={e => setReason(e.target.value)} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)} placeholder="Lunch Break, Vacation, etc." />
+                <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Причина (необов&apos;язково)</label>
+                <input type="text" value={reason} onChange={e => setReason(e.target.value)} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2", th.inputBg, th.border, th.inputFocus)} placeholder="Обід, відпустка тощо" />
               </div>
             )}
 
             <div>
-              <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Notes</label>
-              <textarea value={notes} onChange={e => setNotes(e.target.value)} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-opacity-50 min-h-[80px]", th.bg, th.border)} placeholder="Add any details..." />
+              <label className={clsx("block text-xs font-bold uppercase tracking-wider mb-2", th.subText)}>Нотатки</label>
+              <textarea value={notes} onChange={e => setNotes(e.target.value)} className={clsx("w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-opacity-50 min-h-[80px]", th.bg, th.border)} placeholder="Деталі..." />
             </div>
          </div>
 
          <button onClick={handleSave} disabled={loading} className={clsx("w-full py-4 mt-4 rounded-xl font-bold tracking-wide transition-colors flex items-center justify-center disabled:opacity-50", th.brand)}>
-           {loading ? "Saving..." : isEditMode ? "Save New Time" : slotType === "block" ? "Save Block" : "Create Appointment"}
+           {loading ? "Зберігаємо..." : isEditMode ? "Зберегти новий час" : slotType === "block" ? "Зберегти блок" : "Створити запис"}
          </button>
       </div>
     </div>
@@ -238,7 +238,7 @@ function NewSlotForm() {
 
 export default function NewSlotPage() {
   return (
-    <Suspense fallback={<div className="p-10 text-center text-zinc-400 font-semibold">Loading...</div>}>
+    <Suspense fallback={<div className="p-10 text-center text-zinc-400 font-semibold">Завантаження...</div>}>
       <NewSlotForm />
     </Suspense>
   );

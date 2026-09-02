@@ -54,19 +54,19 @@ export async function fetchLocations(params?: {
   if (params?.per_page) query.set("per_page", String(params.per_page));
 
   const res = await fetch(`${API_URL}/api/locations?${query.toString()}`);
-  if (!res.ok) throw new Error("Failed to fetch locations");
+  if (!res.ok) throw new Error("Не вдалося завантажити локації");
   return res.json();
 }
 
 export async function fetchLocation(id: string): Promise<Location> {
   const res = await fetch(`${API_URL}/api/locations/${id}`);
-  if (!res.ok) throw new Error("Location not found");
+  if (!res.ok) throw new Error("Локацію не знайдено");
   return res.json();
 }
 
 export async function fetchLocationBySlug(slug: string): Promise<Location> {
   const res = await fetch(`${API_URL}/api/locations/slug/${encodeURIComponent(slug)}`);
-  if (!res.ok) throw new Error("Location not found");
+  if (!res.ok) throw new Error("Локацію не знайдено");
   return res.json();
 }
 
@@ -74,7 +74,7 @@ export async function fetchLocationBySlug(slug: string): Promise<Location> {
 
 export async function fetchMyLocations(): Promise<{ locations: Location[] }> {
   const res = await authFetch("/api/users/me/locations");
-  if (!res.ok) throw new Error("Failed to fetch your locations");
+  if (!res.ok) throw new Error("Не вдалося завантажити ваші локації");
   return res.json();
 }
 
@@ -91,7 +91,7 @@ export async function createLocation(data: {
   });
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error || "Failed to create location");
+    throw new Error(err.error || "Не вдалося створити локацію");
   }
   return res.json();
 }
@@ -108,7 +108,7 @@ export interface TelegramLinkResponse {
 export async function getTelegramLink(): Promise<TelegramLinkResponse | null> {
   const res = await authFetch("/api/notifications/telegram/link");
   if (res.status === 503) return null;
-  if (!res.ok) throw new Error("Failed to get Telegram link");
+  if (!res.ok) throw new Error("Не вдалося отримати посилання Telegram");
   return res.json();
 }
 
@@ -140,7 +140,7 @@ export async function searchProfessionals(
   params.set("page", String(page));
   params.set("per_page", String(perPage));
   const res = await authFetch(`/api/professionals/search?${params.toString()}`);
-  if (!res.ok) throw new Error("Failed to search professionals");
+  if (!res.ok) throw new Error("Не вдалося виконати пошук");
   return res.json();
 }
 
@@ -154,7 +154,7 @@ export async function fetchMyStaff(
   params.set("page", String(page));
   params.set("per_page", String(perPage));
   const res = await authFetch(`/api/professionals/my-staff?${params.toString()}`);
-  if (!res.ok) throw new Error("Failed to fetch staff");
+  if (!res.ok) throw new Error("Не вдалося завантажити команду");
   return res.json();
 }
 
@@ -169,7 +169,7 @@ export async function linkProfessionalToLocations(
   });
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error || "Failed to link professional");
+    throw new Error(err.error || "Не вдалося додати майстра");
   }
   return res.json();
 }
@@ -185,7 +185,7 @@ export async function unlinkProfessionalFromLocation(
   });
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error || "Failed to unlink professional");
+    throw new Error(err.error || "Не вдалося відв'язати майстра");
   }
 }
 
@@ -252,7 +252,7 @@ export async function fetchAvailability(
   const res = await fetch(
     `${API_URL}/api/availability?professional_id=${professionalId}&location_id=${locationId}&date=${date}`
   );
-  if (!res.ok) throw new Error("Failed to fetch availability");
+  if (!res.ok) throw new Error("Не вдалося завантажити вільні слоти");
   return res.json();
 }
 
@@ -271,7 +271,7 @@ export async function createAppointment(data: {
   });
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error || "Failed to create appointment");
+    throw new Error(err.error || "Не вдалося створити запис");
   }
   return res.json();
 }
@@ -281,7 +281,7 @@ export async function fetchMyAppointments(
   perPage = 20
 ): Promise<AppointmentListResponse> {
   const res = await authFetch(`/api/appointments?page=${page}&per_page=${perPage}`);
-  if (!res.ok) throw new Error("Failed to fetch appointments");
+  if (!res.ok) throw new Error("Не вдалося завантажити записи");
   return res.json();
 }
 
@@ -296,7 +296,7 @@ export async function updateAppointmentStatus(
   });
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error || "Failed to update status");
+    throw new Error(err.error || "Не вдалося оновити статус");
   }
   return res.json();
 }
@@ -306,7 +306,7 @@ export async function fetchTodaySchedule(
 ): Promise<TodayScheduleResponse> {
   const query = date ? `?date=${date}` : "";
   const res = await authFetch(`/api/dashboard/today${query}`);
-  if (!res.ok) throw new Error("Failed to fetch schedule");
+  if (!res.ok) throw new Error("Не вдалося завантажити розклад");
   return res.json();
 }
 
@@ -337,7 +337,7 @@ export interface SettingsResponse {
 
 export async function fetchSettings(): Promise<SettingsResponse> {
   const res = await authFetch("/api/users/me/settings");
-  if (!res.ok) throw new Error("Failed to fetch settings");
+  if (!res.ok) throw new Error("Не вдалося завантажити налаштування");
   return res.json();
 }
 
@@ -349,7 +349,7 @@ export async function updateSettings(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Failed to update settings");
+  if (!res.ok) throw new Error("Не вдалося зберегти налаштування");
   return res.json();
 }
 
@@ -367,7 +367,7 @@ export async function rescheduleAppointment(
   });
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error || "Failed to reschedule");
+    throw new Error(err.error || "Не вдалося перенести запис");
   }
   return res.json();
 }
@@ -380,7 +380,7 @@ export async function fetchAppointment(id: string): Promise<AppointmentResponse>
 
 export async function deleteScheduleBlock(id: string): Promise<void> {
   const res = await authFetch(`/api/schedule/blocks/${id}`, { method: "DELETE" });
-  if (!res.ok) throw new Error("Failed to delete block");
+  if (!res.ok) throw new Error("Не вдалося видалити блок");
 }
 
 export interface CreateWorkingHoursRequest {
@@ -404,7 +404,7 @@ export interface WorkingHoursResponse {
 
 export async function fetchWorkingHours(): Promise<WorkingHoursResponse[]> {
   const res = await authFetch("/api/schedule/working-hours");
-  if (!res.ok) throw new Error("Failed to fetch working hours");
+  if (!res.ok) throw new Error("Не вдалося завантажити робочі години");
   return res.json();
 }
 
@@ -416,6 +416,6 @@ export async function updateWorkingHours(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error("Failed to update working hours");
+  if (!res.ok) throw new Error("Не вдалося зберегти робочі години");
   return res.json();
 }

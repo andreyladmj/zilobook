@@ -21,6 +21,8 @@ var (
 	ErrSelfBookingDisabled = errors.New("self-booking is disabled for this professional")
 	ErrInvalidStatus       = errors.New("invalid status transition")
 	ErrNotAuthorized       = errors.New("not authorized to modify this appointment")
+	ErrClientStatusChange  = errors.New("clients can only cancel their appointments")
+	ErrCancellationWindow  = errors.New("cancellation window has passed")
 )
 
 type AppointmentService struct {
@@ -236,6 +238,22 @@ func (s *AppointmentService) Reschedule(userID, appointmentID string, req dto.Re
 		return nil, ErrInvalidTimeRange
 	}
 
+	// The client (not the pro) can reschedule only while the cancellation
+	// window is still open, and only to a time that respects the lead limit.
+	if appt.ProfessionalID != userID {
+		if settings, sErr := s.settingsRepo.FindByUserID(appt.ProfessionalID); sErr == nil && settings != nil {
+			loc := utils.LocationOrKyiv(settings.Timezone)
+			window := time.Duration(settings.CancellationWindowHours) * time.Hour
+			if time.Until(utils.WallToReal(appt.StartTime, loc)) < window {
+				return nil, ErrCancellationWindow
+			}
+			lead := time.Duration(settings.MinBookingLeadHours) * time.Hour
+			if time.Until(utils.WallToReal(newStart, loc)) < lead {
+				return nil, ErrTooSoon
+			}
+		}
+	}
+
 	// Check conflicts (exclude the current appointment)
 	existing, _ := s.appointmentRepo.FindByProfessionalAndDateRange(appt.ProfessionalID, newStart, newEnd)
 	for _, e := range existing {
@@ -250,6 +268,12 @@ func (s *AppointmentService) Reschedule(userID, appointmentID string, req dto.Re
 
 	appt.StartTime = newStart
 	appt.EndTime = newEnd
+
+	// Reminders were scheduled for the old time — drop and re-enqueue.
+	if s.notifySvc != nil && appt.ClientID != nil {
+		s.notifySvc.CancelForAppointment(appointmentID)
+		go s.notifyBooking(appointmentID, appt.ProfessionalID, appt.ClientID, newStart, appt.Status == models.StatusConfirmed)
+	}
 
 	s.activitySvc.Log(&userID, "appointment.rescheduled", "appointment", &appointmentID, nil, ip, ua)
 
@@ -276,6 +300,21 @@ func (s *AppointmentService) UpdateStatus(userID, appointmentID, newStatus, ip, 
 	}
 	if !validStatuses[newStatus] {
 		return nil, ErrInvalidStatus
+	}
+
+	// The client (not the pro) may only cancel, and only before the
+	// cancellation window closes.
+	if appt.ProfessionalID != userID {
+		if newStatus != "Cancelled" {
+			return nil, ErrClientStatusChange
+		}
+		if settings, sErr := s.settingsRepo.FindByUserID(appt.ProfessionalID); sErr == nil && settings != nil {
+			loc := utils.LocationOrKyiv(settings.Timezone)
+			window := time.Duration(settings.CancellationWindowHours) * time.Hour
+			if time.Until(utils.WallToReal(appt.StartTime, loc)) < window {
+				return nil, ErrCancellationWindow
+			}
+		}
 	}
 
 	if err := s.appointmentRepo.UpdateStatus(appointmentID, models.AppointmentStatus(newStatus)); err != nil {

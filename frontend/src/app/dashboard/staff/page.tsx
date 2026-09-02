@@ -21,21 +21,21 @@ export default function StaffPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Staff & Personnel</h1>
-          <p className={clsx("mt-1 font-medium", th.subText)}>Professionals linked to your locations.</p>
+          <h1 className="text-3xl font-bold tracking-tight">Команда</h1>
+          <p className={clsx("mt-1 font-medium", th.subText)}>Майстри, прив&apos;язані до ваших локацій.</p>
         </div>
         <button
           onClick={() => router.push('/dashboard/staff/new')}
           className={clsx("px-5 py-2.5 rounded-xl font-bold text-sm transition-colors flex items-center gap-2", th.brand)}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4"/></svg>
-          Link Professional
+          Додати майстра
         </button>
       </div>
 
       {/* Search + Trainer Cards */}
       <SearchList<ProfessionalSearchResult>
-        placeholder="Search your staff by name..."
+        placeholder="Пошук по імені..."
         perPage={40}
         fetcher={fetcher}
         renderEmpty={() => (
@@ -44,15 +44,15 @@ export default function StaffPage() {
               <svg className={clsx("w-8 h-8", th.subText)} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/></svg>
             </div>
             <div>
-              <p className="font-bold text-lg">No staff linked yet</p>
-              <p className={clsx("text-sm mt-1 max-w-md mx-auto", th.subText)}>Link professionals to your locations so they appear here. Click the button below to get started.</p>
+              <p className="font-bold text-lg">Команда поки порожня</p>
+              <p className={clsx("text-sm mt-1 max-w-md mx-auto", th.subText)}>Прив&apos;яжіть майстрів до своїх локацій, щоб вони з&apos;явилися тут.</p>
             </div>
             <button
               onClick={() => router.push('/dashboard/staff/new')}
               className={clsx("px-6 py-3 rounded-xl font-bold text-sm transition-colors inline-flex items-center gap-2", th.brand)}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4"/></svg>
-              Link Your First Professional
+              Додати першого майстра
             </button>
           </div>
         )}
@@ -87,7 +87,7 @@ export default function StaffPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <h3 className="text-xl font-bold tracking-tight">{pro.full_name}</h3>
-                    <p className={clsx("text-sm font-medium mt-1", th.subText)}>Professional</p>
+                    <p className={clsx("text-sm font-medium mt-1", th.subText)}>Майстер</p>
                   </div>
                   <div className={clsx("px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider flex-shrink-0", th.tabBg, th.accent)}>
                     PRO

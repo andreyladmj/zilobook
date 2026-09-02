@@ -22,7 +22,7 @@ interface SearchListProps<T> {
 }
 
 export default function SearchList<T>({
-  placeholder = "Search...",
+  placeholder = "Пошук...",
   perPage = 20,
   fetcher,
   renderItem,
@@ -105,7 +105,7 @@ export default function SearchList<T>({
       {/* Results count */}
       {!loading && (
         <p className={clsx("text-xs font-bold uppercase tracking-wider px-1", th.subText)}>
-          {total} result{total !== 1 ? "s" : ""}{query ? ` for "${query}"` : ""}
+          {total} знайдено{query ? ` за запитом "${query}"` : ""}
         </p>
       )}
 
@@ -122,8 +122,8 @@ export default function SearchList<T>({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
               </svg>
             </div>
-            <p className={clsx("font-medium", th.subText)}>No results found</p>
-            {query && <p className={clsx("text-sm", th.subText)}>Try a different search term</p>}
+            <p className={clsx("font-medium", th.subText)}>Нічого не знайдено</p>
+            {query && <p className={clsx("text-sm", th.subText)}>Спробуйте інший запит</p>}
           </div>
         )
       ) : (
@@ -144,9 +144,9 @@ export default function SearchList<T>({
               )}
             >
               {loadingMore ? (
-                <><div className={clsx("w-4 h-4 border-2 rounded-full animate-spin", th.border, "border-t-current")}></div> Loading...</>
+                <><div className={clsx("w-4 h-4 border-2 rounded-full animate-spin", th.border, "border-t-current")}></div> Завантаження...</>
               ) : (
-                `Load More (${items.length} of ${total})`
+                `Показати ще (${items.length} з ${total})`
               )}
             </button>
           )}

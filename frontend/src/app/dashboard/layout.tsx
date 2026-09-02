@@ -40,13 +40,14 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
       .catch(() => {});
   }, [router, setThemeId]);
 
+  // name keys NAV_ICONS; label is what the user sees
   const navLinks = [
-    { name: "Overview", href: "/dashboard" },
-    { name: "Calendar", href: "/dashboard/calendar" },
-    { name: "Clients", href: "/dashboard/clients" },
-    { name: "Locations", href: "/dashboard/locations" },
-    { name: "Staff", href: "/dashboard/staff" },
-    { name: "Settings", href: "/dashboard/settings" },
+    { name: "Overview", label: "Огляд", href: "/dashboard" },
+    { name: "Calendar", label: "Календар", href: "/dashboard/calendar" },
+    { name: "Clients", label: "Клієнти", href: "/dashboard/clients" },
+    { name: "Locations", label: "Локації", href: "/dashboard/locations" },
+    { name: "Staff", label: "Команда", href: "/dashboard/staff" },
+    { name: "Settings", label: "Налаштування", href: "/dashboard/settings" },
   ];
 
   return (
@@ -76,7 +77,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
                 )}
               >
                 {NAV_ICONS[link.name]}
-                {link.name}
+                {link.label}
               </Link>
             );
           })}
@@ -107,15 +108,15 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
               {user?.full_name?.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase() || "?"}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">{user?.full_name || "Loading..."}</p>
-              <p className={clsx("text-xs", th.subText)}>{user?.role === "PROFESSIONAL" ? "Pro" : "Client"}</p>
+              <p className="text-sm font-semibold truncate">{user?.full_name || "Завантаження..."}</p>
+              <p className={clsx("text-xs", th.subText)}>{user?.role === "PROFESSIONAL" ? "Майстер" : "Клієнт"}</p>
             </div>
           </div>
           <button
             onClick={async () => { await logout(); router.push('/'); }}
             className={clsx("w-full mt-3 py-2 rounded-xl border text-xs font-bold transition-colors", th.border, th.subText, "hover:opacity-80")}
           >
-            Sign Out
+            Вийти
           </button>
         </div>
       </aside>
@@ -147,7 +148,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
           <div className={clsx("absolute top-0 right-0 w-72 h-full shadow-2xl flex flex-col", th.cardBg)}>
             <div className={clsx("p-4 border-b flex items-center justify-between", th.border)}>
-              <span className="font-bold">Menu</span>
+              <span className="font-bold">Меню</span>
               <button onClick={() => setMobileMenuOpen(false)} className={clsx("p-2 rounded-xl", th.tabBg)}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
@@ -166,7 +167,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
                     )}
                   >
                     {NAV_ICONS[link.name]}
-                    {link.name}
+                    {link.label}
                   </Link>
                 );
               })}
@@ -176,7 +177,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
                 onClick={async () => { await logout(); router.push('/'); }}
                 className={clsx("w-full py-3 rounded-xl border text-sm font-bold transition-colors", th.border)}
               >
-                Sign Out
+                Вийти
               </button>
             </div>
           </div>

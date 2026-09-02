@@ -67,35 +67,35 @@ export default function DashboardOverview() {
     <div className="p-6 md:p-10 max-w-5xl mx-auto space-y-8 relative pb-24">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
-          <p className={clsx("mt-1 font-medium", th.subText)}>Welcome back{user ? `, ${user.full_name.split(" ")[0]}` : ""}. Here&apos;s your schedule for today.</p>
+          <h1 className="text-3xl font-bold tracking-tight">Огляд</h1>
+          <p className={clsx("mt-1 font-medium", th.subText)}>З поверненням{user ? `, ${user.full_name.split(" ")[0]}` : ""}! Ось ваш розклад на сьогодні.</p>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className={clsx("p-6 rounded-2xl border shadow-sm flex flex-col justify-center", th.statCard)}>
-          <p className={clsx("text-sm font-semibold mb-2", th.subText)}>Appointments Today</p>
+          <p className={clsx("text-sm font-semibold mb-2", th.subText)}>Записів сьогодні</p>
           <div className="flex items-end gap-3">
              <p className={clsx("text-5xl font-extrabold tracking-tighter", th.accent)}>{loading ? "—" : totalToday}</p>
-             <p className={clsx("text-sm font-medium mb-1", th.subText)}>sessions</p>
+             <p className={clsx("text-sm font-medium mb-1", th.subText)}>сеансів</p>
           </div>
         </div>
         <div className={clsx("p-6 rounded-2xl border shadow-sm flex flex-col justify-center", th.statCard)}>
-          <p className={clsx("text-sm font-semibold mb-2", th.subText)}>Pending Approvals</p>
+          <p className={clsx("text-sm font-semibold mb-2", th.subText)}>Очікують підтвердження</p>
           <div className="flex items-end gap-3">
              <p className="text-5xl font-extrabold tracking-tighter text-amber-500">{loading ? "—" : pendingCount}</p>
-             <p className={clsx("text-sm font-medium mb-1", th.subText)}>require action</p>
+             <p className={clsx("text-sm font-medium mb-1", th.subText)}>потребують дії</p>
           </div>
         </div>
       </div>
 
       {/* Timeline */}
       <div>
-        <h2 className="text-xl font-bold tracking-tight mb-4">Today&apos;s Timeline</h2>
+        <h2 className="text-xl font-bold tracking-tight mb-4">Розклад дня</h2>
         <div className={clsx("border rounded-2xl shadow-sm p-4 md:p-6", th.cardBg, th.border)}>
            {loading ? (
-             <div className={clsx("text-center py-10 font-semibold", th.subText)}>Loading schedule...</div>
+             <div className={clsx("text-center py-10 font-semibold", th.subText)}>Завантажуємо розклад...</div>
            ) : (
            <div className="flex flex-col relative w-full">
               {["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00"].map((hour, i) => {
@@ -111,7 +111,7 @@ export default function DashboardOverview() {
                               onClick={() => setSelectedClient(toClientData(slot))}
                               className={clsx("w-full h-full rounded-xl flex items-center px-4 cursor-pointer transition-colors", th.tabBg)}
                            >
-                              <span className={clsx("text-sm font-semibold", th.subText)}>{slot.block_reason || "Blocked"}</span>
+                              <span className={clsx("text-sm font-semibold", th.subText)}>{slot.block_reason || "Заблоковано"}</span>
                            </div>
                         ) : slot && slot.client ? (
                            <div
@@ -123,14 +123,14 @@ export default function DashboardOverview() {
                            >
                               <div className="flex justify-between items-start">
                                  <span className="text-sm font-bold">{slot.client}</span>
-                                 {slot.status === 'Pending' && <span className={clsx("text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md", th.pendingBadge)}>Pending</span>}
+                                 {slot.status === 'Pending' && <span className={clsx("text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-md", th.pendingBadge)}>Очікує</span>}
                               </div>
                               <span className="text-xs mt-1 opacity-70">{slot.service} • {slot.duration}</span>
                            </div>
                         ) : (
                            <div className="w-full h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => router.push('/dashboard/calendar/new')} className={clsx("text-xs font-bold transition-colors flex items-center gap-1", th.subText)}>
-                                 + Block or Book
+                                 + Запис або блок
                               </button>
                            </div>
                         )}
