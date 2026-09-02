@@ -9,6 +9,8 @@ import { fetchMyAppointments, fetchMyLocations, updateAppointmentStatus, deleteS
 import { kyivToday, kyivNow } from "@/lib/kyivtime";
 
 const VIEW_UA: Record<"Day" | "Week" | "Month", string> = { Day: "День", Week: "Тиждень", Month: "Місяць" };
+// API status values stay English; display-only mapping
+const STATUS_UA: Record<string, string> = { Confirmed: "Підтверджено", Pending: "Очікує", Cancelled: "Скасовано", Completed: "Завершено", NoShow: "Неявка" };
 
 type ScheduleItem = {
   id: string;
@@ -320,7 +322,7 @@ export default function CalendarPage() {
                                     "rounded-xl cursor-pointer flex flex-col overflow-hidden hover:scale-[1.02] transition-transform z-10 shadow-sm",
                                     slotStyle(slot.status)
                                   )}>
-                                   <span className="text-[10px] font-bold opacity-80 mb-0.5">{slot.status}</span>
+                                   <span className="text-[10px] font-bold opacity-80 mb-0.5">{STATUS_UA[slot.status] ?? slot.status}</span>
                                    <span className="text-xs font-bold truncate">{slot.client}</span>
                                    <span className="text-[10px] opacity-70">{slot.duration}{slot.locationName ? ` • ${slot.locationName}` : ""}</span>
                                 </div>
