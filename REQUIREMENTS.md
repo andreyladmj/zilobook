@@ -22,7 +22,7 @@ Status legend: `[x]` done · `[ ]` todo · `[~]` partially done.
 
 ### 1.1 Booking core
 - [ ] End-to-end happy path verified: register pro → create location + services → set working hours → client opens booking link → books → pro sees it in dashboard
-- [ ] Public booking link short URL (e.g. `/b/[slug]`) — this is THE artifact pros paste into Instagram bio; must work without login and load fast on mobile
+- [x] Public booking link short URL `/b/[slug]` — resolves title_slug via GET /api/locations/slug/:slug and lands on the booking flow; works without login
 - [ ] Anonymized public calendar (booked slots = generic blocks, no client names/phones) — already a stated principle, verify it holds
 - [ ] Appointment statuses lifecycle (pending → confirmed → completed/cancelled/no-show) with `no-show` as an explicit status (feeds future analytics: "X UAH saved")
 - [ ] Client cancellation/reschedule flow with a configurable cutoff (e.g. not later than 24h before)
@@ -90,8 +90,8 @@ Ukrainian PSPs (WayForPay, LiqPay/Privat, Fondy, monobank acquiring) all ship **
 
 - [x] **Deployed**: Hetzner VPS (Ubuntu 24.04) + Docker Compose (Caddy auto-TLS → Next.js + Go API → Postgres 17), see `deploy/README.md`
 - [x] Domains: zilobook.com bought (Cloudflare Registrar); `@`, `www`, `nails`, `app` live behind Cloudflare proxy, SSL Full (strict), Always Use HTTPS
-- [~] Postgres backups: `deploy/backup-db.sh` written — **cron not set up on server yet**; off-server upload + restore test still TODO
-- [~] CI/CD: `.github/workflows/deploy.yml` ready — **needs DEPLOY_HOST / DEPLOY_SSH_KEY repo secrets**; no test step before deploy yet
+- [~] Postgres backups: daily 03:30 via `/etc/cron.d/zilobook-backup` on the server (verified 2026-09-02, dumps in /opt/zilobook/backups); off-server upload + restore test still TODO
+- [x] CI/CD: `.github/workflows/deploy.yml` deploys main → prod (secrets set, verified working); no test step before deploy yet
 - [x] Secrets: real JWT_SECRET + DB password in server-side .env; backend refuses default JWT_SECRET when GIN_MODE=release
 - [ ] Monitoring: Sentry (frontend + Go), uptime check on booking link route (Betterstack/UptimeRobot), structured logs
 - [ ] Error pages, 404, maintenance page

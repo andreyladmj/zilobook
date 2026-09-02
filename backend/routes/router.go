@@ -41,6 +41,7 @@ func Setup(
 
 	// --- Public location, professional, availability routes ---
 	api.GET("/locations", locationCtrl.List)
+	api.GET("/locations/slug/:slug", locationCtrl.GetBySlug)
 	api.GET("/locations/:id", locationCtrl.GetByID)
 	api.GET("/professionals", professionalCtrl.ListByLocation)
 	api.GET("/professionals/:id", professionalCtrl.GetByID)

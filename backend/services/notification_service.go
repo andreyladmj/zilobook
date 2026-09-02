@@ -11,6 +11,7 @@ import (
 	"gymapp-backend/models"
 	"gymapp-backend/repositories"
 	"gymapp-backend/telegram"
+	"gymapp-backend/utils"
 )
 
 const (
@@ -77,7 +78,9 @@ func (s *NotificationService) EnqueueBooking(appointmentID, professionalID strin
 	}
 
 	proName := s.userName(professionalID)
-	when := start.In(s.loc)
+	// start is fake-UTC: its components already ARE the pro's wall clock,
+	// so format it as-is — converting to s.loc would shift it a second time.
+	when := start.UTC()
 
 	// To the client: confirmation now + reminders before the appointment.
 	if clientID != nil && confirmed {
@@ -116,7 +119,10 @@ func (s *NotificationService) EnqueueBooking(appointmentID, professionalID strin
 
 // scheduleReminder enqueues a reminder only if its fire time is still in the future.
 func (s *NotificationService) scheduleReminder(appointmentID, clientID string, start time.Time, before time.Duration, when time.Time, proName string) {
-	fireAt := start.Add(-before)
+	// start is fake-UTC wall clock; the dispatcher compares scheduled_for with
+	// real time.Now(), so anchor the reminder to the real instant.
+	realStart := utils.WallToReal(start, s.loc)
+	fireAt := realStart.Add(-before)
 	if time.Until(fireAt) <= 0 {
 		return // booking made closer than this reminder window
 	}

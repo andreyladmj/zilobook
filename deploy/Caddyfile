@@ -19,6 +19,7 @@
 
 zilobook.com,
 nails.zilobook.com,
+fit.zilobook.com,
 app.zilobook.com {
 	import zilobook
 }
@@ -28,6 +29,6 @@ www.zilobook.com {
 }
 
 # Future niche domains — uncomment after creating their DNS records:
-# beauty.zilobook.com, fit.zilobook.com, trainer.zilobook.com, auto.zilobook.com {
+# beauty.zilobook.com, trainer.zilobook.com, auto.zilobook.com {
 # 	import zilobook
 # }

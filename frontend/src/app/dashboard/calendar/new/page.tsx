@@ -6,6 +6,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import { clsx } from "clsx";
 import { authFetch, getUser } from "@/lib/auth";
 import { fetchAppointment, fetchMyLocations, createAppointment, rescheduleAppointment, fetchMyAppointments, type Location, type AppointmentResponse } from "@/lib/api";
+import { kyivToday } from "@/lib/kyivtime";
 import { Suspense } from "react";
 
 function NewSlotForm() {
@@ -21,7 +22,7 @@ function NewSlotForm() {
   const [error, setError] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const [date, setDate] = useState(paramDate || new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(paramDate || kyivToday());
   const [startTime, setStartTime] = useState(paramTime || "10:00");
   const [duration, setDuration] = useState("01:00");
   const [reason, setReason] = useState("");

@@ -64,6 +64,12 @@ export async function fetchLocation(id: string): Promise<Location> {
   return res.json();
 }
 
+export async function fetchLocationBySlug(slug: string): Promise<Location> {
+  const res = await fetch(`${API_URL}/api/locations/slug/${encodeURIComponent(slug)}`);
+  if (!res.ok) throw new Error("Location not found");
+  return res.json();
+}
+
 // --- Authenticated fetches ---
 
 export async function fetchMyLocations(): Promise<{ locations: Location[] }> {

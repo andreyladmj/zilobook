@@ -51,6 +51,22 @@ func (lc *LocationController) GetByID(c *gin.Context) {
 	utils.Success(c, http.StatusOK, result)
 }
 
+func (lc *LocationController) GetBySlug(c *gin.Context) {
+	slug := c.Param("slug")
+
+	result, err := lc.locationService.GetBySlug(slug)
+	if err != nil {
+		if errors.Is(err, services.ErrLocationNotFound) {
+			utils.Error(c, http.StatusNotFound, "Location not found")
+		} else {
+			utils.Error(c, http.StatusInternalServerError, "Failed to fetch location")
+		}
+		return
+	}
+
+	utils.Success(c, http.StatusOK, result)
+}
+
 func (lc *LocationController) Create(c *gin.Context) {
 	var req dto.CreateLocationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

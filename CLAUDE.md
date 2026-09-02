@@ -56,10 +56,12 @@ backend/
 ├── services/            # auth_service, location_service, activity_service, settings_service
 ├── controllers/         # auth, location_controller, professional_controller, settings_controller
 ├── routes/router.go     # Centralized Gin routing + CORS + middleware groups
-└── migrations/
+└── migrations/                # Runner re-executes EVERY *.up.sql on each boot (alphabetical), so all files must be idempotent
     ├── 000001_init.up.sql     # Core schema (9 tables)
     ├── 000002_phase2.up.sql   # activity_log, user_settings, services, reviews, waitlist, notifications + locations.owner_id
-    └── 000003_telegram.up.sql # telegram_accounts, telegram_link_codes + notifications dispatch columns
+    ├── 000003_seed_data.up.sql        # Demo pros/locations/links (password: password123, login by phone)
+    ├── 000004_telegram.up.sql         # telegram_accounts, telegram_link_codes + notifications dispatch columns
+    └── 000005_seed_working_hours.up.sql # Working hours for seed pros (skips pairs that already have hours)
 ```
 
 ## Database Schema (15 tables, all UUID PKs)
@@ -84,12 +86,13 @@ frontend/src/
 ## Working API Endpoints
 ### Auth (public)
 - POST /api/auth/register → {access_token, refresh_token, user}
-- POST /api/auth/login → phone or email auth
+- POST /api/auth/login → phone + password (phone-only by design for now)
 - POST /api/auth/refresh → token rotation
 - POST /api/auth/logout → revokes refresh token
 ### Locations (public read, pro-only write)
 - GET /api/locations → list with ?type=&search=&page=&per_page= filters
 - GET /api/locations/:id → detail with images + professionals
+- GET /api/locations/slug/:slug → same detail by title_slug (powers the /b/[slug] short booking link)
 - POST /api/locations → create (pro only, auth required)
 - PUT /api/locations/:id → update (owner only)
 - DELETE /api/locations/:id → delete (owner only)
@@ -131,6 +134,11 @@ Provider-agnostic notification subsystem; Telegram is the primary (free) channel
 - **Roles:** CLIENT | PROFESSIONAL (stored in users.role)
 - **Phone is primary identifier** (stored in user_phones table, not users table)
 - **Email is optional** (nullable on users table)
+
+## Time Convention (fake-UTC)
+All appointment/schedule times are the pro's **wall clock** (Europe/Kyiv) stored/sent with a `Z` label.
+- Frontend: read components ONLY via getUTC* / format with `timeZone: "UTC"`; derive "now"/"today" via `lib/kyivtime.ts` (kyivToday/kyivNow), never from the browser clock.
+- Backend: before comparing a stored time against real `time.Now()` (lead-time checks, reminder scheduling), convert via `utils.WallToReal` / `utils.LocationOrKyiv` (utils/timeutil.go).
 
 ## How to Run
 ```bash

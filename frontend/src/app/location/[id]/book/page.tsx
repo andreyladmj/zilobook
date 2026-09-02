@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { clsx } from "clsx";
 import { ThemeProvider, useTheme, themeForLocationType } from "@/components/ThemeProvider";
 import { fetchLocation, fetchAvailability, type Location, type Professional, type TimeSlot } from "@/lib/api";
+import { kyivToday } from "@/lib/kyivtime";
 
 const FALLBACK_IMAGES: Record<string, string> = {
   Gym: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80",
@@ -31,8 +32,9 @@ function BookingInner({ id }: { id: string }) {
   const [loading, setLoading] = useState(true);
   const [slotsLoading, setSlotsLoading] = useState(false);
 
-  const today = new Date();
-  const [selectedDate, setSelectedDate] = useState(today.toISOString().split("T")[0]);
+  // "Today" on the pro's wall clock (Kyiv), not the visitor's browser clock.
+  const todayISO = kyivToday();
+  const [selectedDate, setSelectedDate] = useState(todayISO);
   const [view, setView] = useState<"Day" | "Week" | "Month">("Day");
 
   useEffect(() => {
@@ -69,7 +71,7 @@ function BookingInner({ id }: { id: string }) {
     return Array.from({ length: 7 }, (_, i) => {
       const date = new Date(monday);
       date.setDate(monday.getDate() + i);
-      return { label: WEEKDAYS_SHORT[i], dateNum: date.getDate(), dateStr: date.toISOString().split("T")[0], isWeekend: date.getDay() === 0 || date.getDay() === 6, isToday: date.toISOString().split("T")[0] === today.toISOString().split("T")[0] };
+      return { label: WEEKDAYS_SHORT[i], dateNum: date.getDate(), dateStr: date.toISOString().split("T")[0], isWeekend: date.getDay() === 0 || date.getDay() === 6, isToday: date.toISOString().split("T")[0] === todayISO };
     });
   };
 
@@ -205,7 +207,7 @@ function BookingInner({ id }: { id: string }) {
                   const d = new Date(selectedDate); d.setDate(1); d.setDate(i + 1);
                   const ds = d.toISOString().split("T")[0];
                   const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-                  const isToday = ds === today.toISOString().split("T")[0];
+                  const isToday = ds === todayISO;
                   return (
                     <button key={i} onClick={() => { setSelectedDate(ds); setView("Day"); }} className={clsx("border-r border-b aspect-square p-2 flex items-center justify-center transition-colors", th.border, isWeekend ? "opacity-70" : "")}>
                       <span className={clsx("w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold", isToday ? th.todayCircle : isWeekend ? th.weekendText : "")}>{i + 1}</span>

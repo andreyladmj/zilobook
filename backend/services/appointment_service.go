@@ -9,6 +9,7 @@ import (
 	"gymapp-backend/dto"
 	"gymapp-backend/models"
 	"gymapp-backend/repositories"
+	"gymapp-backend/utils"
 )
 
 var (
@@ -102,12 +103,15 @@ func (s *AppointmentService) Create(callerID, callerRole string, req dto.CreateA
 			if !settings.AllowClientSelfBooking {
 				return nil, ErrSelfBookingDisabled
 			}
+			// startTime is fake-UTC (pro's wall clock); convert to the real
+			// instant before comparing with time.Now().
+			realStart := utils.WallToReal(startTime, utils.LocationOrKyiv(settings.Timezone))
 			leadHours := time.Duration(settings.MinBookingLeadHours) * time.Hour
-			if time.Until(startTime) < leadHours {
+			if time.Until(realStart) < leadHours {
 				return nil, ErrTooSoon
 			}
 			maxAdvance := time.Duration(settings.MaxBookingAdvanceDays) * 24 * time.Hour
-			if time.Until(startTime) > maxAdvance {
+			if time.Until(realStart) > maxAdvance {
 				return nil, ErrTooFarAhead
 			}
 		}
@@ -300,7 +304,8 @@ func (s *AppointmentService) UpdateStatus(userID, appointmentID, newStatus, ip, 
 func (s *AppointmentService) GetTodaySchedule(proID string, dateStr string) (*dto.TodayScheduleResponse, error) {
 	date, err := time.Parse("2006-01-02", dateStr)
 	if err != nil {
-		date = time.Now()
+		// Default to "today" on the pro's wall clock, not the server's UTC date.
+		date = utils.WallNow(utils.LocationOrKyiv(""))
 	}
 
 	dayStart := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)

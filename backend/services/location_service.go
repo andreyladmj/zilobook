@@ -64,6 +64,21 @@ func (s *LocationService) GetByID(id string) (*dto.LocationResponse, error) {
 	return s.toResponse(loc, images, pros), nil
 }
 
+func (s *LocationService) GetBySlug(slug string) (*dto.LocationResponse, error) {
+	loc, err := s.locationRepo.FindBySlug(slug)
+	if err == sql.ErrNoRows {
+		return nil, ErrLocationNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	images, _ := s.locationRepo.FindImagesByLocationID(loc.ID)
+	pros, _ := s.locationRepo.FindProfessionalsByLocationID(loc.ID)
+
+	return s.toResponse(loc, images, pros), nil
+}
+
 func (s *LocationService) List(locationType, search string, page, perPage int) (*dto.LocationListResponse, error) {
 	if page < 1 {
 		page = 1

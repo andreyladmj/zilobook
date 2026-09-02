@@ -57,6 +57,19 @@ func (r *LocationRepo) FindByID(id string) (*models.Location, error) {
 	return loc, nil
 }
 
+func (r *LocationRepo) FindBySlug(slug string) (*models.Location, error) {
+	loc := &models.Location{}
+	err := r.db.QueryRow(
+		`SELECT id, owner_id, name, title_slug, type, address, description, created_at
+		 FROM locations WHERE title_slug = $1`,
+		slug,
+	).Scan(&loc.ID, &loc.OwnerID, &loc.Name, &loc.TitleSlug, &loc.Type, &loc.Address, &loc.Description, &loc.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return loc, nil
+}
+
 func (r *LocationRepo) FindAll(locationType, search string, page, perPage int) ([]models.Location, int, error) {
 	var conditions []string
 	var args []interface{}

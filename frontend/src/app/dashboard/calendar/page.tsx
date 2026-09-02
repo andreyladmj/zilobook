@@ -6,6 +6,7 @@ import { clsx } from "clsx";
 import { useRouter } from "next/navigation";
 import { useTheme, THEMES, type ThemeKey } from "@/components/ThemeProvider";
 import { fetchMyAppointments, fetchMyLocations, updateAppointmentStatus, deleteScheduleBlock, type AppointmentResponse, type Location } from "@/lib/api";
+import { kyivToday, kyivNow } from "@/lib/kyivtime";
 
 type ScheduleItem = {
   id: string;
@@ -31,8 +32,9 @@ export default function CalendarPage() {
   const [monthEventsDay, setMonthEventsDay] = useState<number | null>(null);
   const [view, setView] = useState<"Day" | "Week" | "Month">("Week");
   
-  // Dynamic Date State
-  const [currentDate, setCurrentDate] = useState(new Date());
+  // Dynamic Date State. Appointment times are fake-UTC (pro's wall clock),
+  // so "today" must come from Kyiv wall time, not the browser or real UTC.
+  const [currentDate, setCurrentDate] = useState(() => new Date(kyivToday() + "T00:00:00Z"));
   const currentDateString = currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
 
   const [appointments, setAppointments] = useState<AppointmentResponse[]>([]);
@@ -43,9 +45,9 @@ export default function CalendarPage() {
 
   useEffect(() => {
      const updateTime = () => {
-        const now = new Date();
-        if (now.getHours() >= 8 && now.getHours() <= 22) {
-           setCurrentTimePos((now.getHours() - 8) * 140 + (now.getMinutes() / 60) * 140);
+        const now = kyivNow(); // wall clock the calendar grid lives in
+        if (now.hours >= 8 && now.hours <= 22) {
+           setCurrentTimePos((now.hours - 8) * 140 + (now.minutes / 60) * 140);
         } else {
            setCurrentTimePos(-1);
         }
@@ -99,8 +101,8 @@ export default function CalendarPage() {
     ? allSchedule
     : allSchedule.filter(s => s.locationId === selectedLocationId);
 
-  const today = new Date();
-  const todayISO = `${today.getUTCFullYear()}-${String(today.getUTCMonth() + 1).padStart(2, "0")}-${String(today.getUTCDate()).padStart(2, "0")}`;
+  const todayISO = kyivToday();
+  const today = new Date(todayISO + "T00:00:00Z");
 
   // Return ALL slots for an hour+day (supports overlapping)
   const getSlots = (hour: string, day?: number, monthNum?: number): ScheduleItem[] => {
